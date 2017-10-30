@@ -1,0 +1,31 @@
+import React,{Component} from 'react';
+import ReactDOM from 'react-dom';
+import {TextField,Paper,RaisedButton,SelectField,
+    MenuItem,Checkbox,RadioButton,RadioButtonGroup,
+    Tab,Tabs,AutoComplete} from 'material-ui';
+import MUICont from 'material-ui/styles/MuiThemeProvider';
+
+
+export default function main(){
+    let root = document.getElementById('main');
+    root.limpiar();
+    
+    document.getElementById('titulo').innerText = 'Gestion de personal';
+
+    ReactDOM.render(
+        <div style={{margin:"30px"}}>
+            <MUICont>
+                <Contenedor/>
+            </MUICont>
+        </div>,
+        root
+    )
+} 
+
+
+class Contenedor extends Component{
+
+    constructor(props){
+        super(props)
+    }
+}
