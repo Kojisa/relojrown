@@ -10,7 +10,6 @@ export default function main(props){
     let root = document.getElementById('main');
     root.limpiar();
 
-    document.getElementById('titulo').innerText = 'Muestra Presupuestaria';
 
     ReactDOM.render(
         <div style={{margin:"30px",height:'100%'}}>

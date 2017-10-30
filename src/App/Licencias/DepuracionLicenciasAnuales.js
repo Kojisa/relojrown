@@ -9,7 +9,6 @@ export default function main(props){
     let root = document.getElementById('main');
     root.limpiar();
     
-    document.getElementById('titulo').innerText = 'Actualización de inasistencias';
 
     ReactDOM.render(
         <div style={{margin:"30px"}}>

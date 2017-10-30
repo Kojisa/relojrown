@@ -10,8 +10,6 @@ export default function main(props){
     let root = document.getElementById('main');
     root.limpiar();
 
-    document.getElementById('titulo').innerText = 'Bloqueo de Dependencias';
-
     ReactDOM.render(
         <div style={{margin:"30px"}}>
             <MUICont>

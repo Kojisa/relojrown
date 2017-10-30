@@ -9,8 +9,6 @@ import DBHandler from '../DBHandler.js';
 export default function main(){
     let root = document.getElementById('main');
     root.limpiar();
-    
-    document.getElementById('titulo').innerText = 'Gestion de personal';
 
     ReactDOM.render(
         <div style={{margin:"30px"}}>
@@ -35,6 +33,7 @@ class Contenedor extends Component{
             tipoAsistencia:null,
             anios25:false,
             premio:null,
+            dependencia:'',
             horarios:{'':[['',''],['',''],['',''],['',''],['',''],['',''],['',''],['','']]},
 
         }
@@ -65,6 +64,7 @@ class Contenedor extends Component{
                     anios25={this.state.anios25}
                     premio={this.state.premio}
                     legajo={this.state.legajo}
+                    dependencia={this.state.dependencia}
                     />
                 </div>
                 <div style={{display:'inline-block',margin:'5px',verticalAlign:'top'}}>
@@ -89,7 +89,11 @@ class DatosBasicos extends Component{
             persona:props.persona,
             tipoAsistencia:props.tipoAsistencia,
             anios25:props.anios25,
-            premio:props.premio
+            premio:props.premio,
+            dependencia:props.dependencia,
+            dependencias:[],
+            dependenciasCodigo:{},
+            codigoDependencias:{},
         }
         this.actualizarPadre = props.funAct;
         this.actualizarDatos = this.actualizarDatos.bind(this);
@@ -97,13 +101,29 @@ class DatosBasicos extends Component{
         this.actualizarCheck = this.actualizarCheck.bind(this);
         this.actualizarPremio = this.actualizarPremio.bind(this);
         this.buscarNombre = this.buscarNombre.bind(this);
+        this.db = new DBHandler();
+
+        this.db.pedir_todas_las_dependencias(this.cargarDependencias)
     }
 
     componentWillReceiveProps(props){
         this.setState({persona:props.persona,
             tipoAsistencia:props.tipoAsistencia,
             anios25:props.anios25,
-            premio:props.premio})
+            premio:props.premio,
+            dependencia:props.dependencia})
+    }
+
+    cargarDependencias(datos){
+        let listaFinal = [];
+        let dependenciasCodigo = {};
+        let codigoDependencias = {};
+        for (let x = 0; x < datos['dependencies'].length; x++){
+            listaFinal.push[datos['dependencies'][1]];
+            dependenciasCodigo[datos['dependencies'][1]] = datos['dependencies'][0]; //para tener la referencia de que rependencia es.
+            codigoDependencias[datos['dependencies'][0]] = datos['dependencies'][1];
+        }
+        this.setState({dependencias:listaFinal,dependenciasCodigo:dependenciasCodigo,codigoDependencias:codigoDependencias});
     }
 
 
@@ -111,7 +131,6 @@ class DatosBasicos extends Component{
 
         let campo = evento.target.name;
         let dato = evento.target.value;
-        this.setState({[campo]:dato});
         this.actualizarPadre(dato,campo);
     }
 
@@ -128,18 +147,15 @@ class DatosBasicos extends Component{
 
     actualizarTipoAsist(evento,key,valor){
         this.actualizarPadre(valor,'tipoAsistencia');
-        this.setState({'tipoAsistencia':valor});
     }
 
     actualizarCheck(evento, checked){
         this.actualizarPadre(checked,'anios25');
-        this.setState({'anios25':checked});
 
     }
 
     actualizarPremio(valor){
-        this.actualizarPadre({'premio':valor})
-        this.setState({'premio':valor})
+        this.actualizarPadre({'premio':valor});
     }
 
     render(){
@@ -156,6 +172,7 @@ class DatosBasicos extends Component{
                     <Checkbox label={<label>25 Años de servicio: </label>} checked={this.state.anios25} onCheck={this.actualizarCheck}
                      labelPosition='left' style={{paddingTop:'10px'}} />
                     <br/>
+                    <AutoComplete floatingLabelText={ <label htmlFor="">Dependencia</label> } value={this.state.dependencia}/>
                     <Premio funAct={this.actualizarPremio} premio={this.state.premio} />
                 </div>
             </div>
