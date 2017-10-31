@@ -34,7 +34,24 @@ class Contenedor extends Component{
             anios25:false,
             premio:null,
             dependencia:'',
-            horarios:[],
+            horarios:[{
+                "building": 24,
+                "valid_from": '2017-05-05',
+                "valid_to": '2017-06-05',
+                "schedule": {
+                    "lunes": ['09:00', '12:00'],
+                    "jueves": ['11:00', '19:00']
+                    }
+                },{
+                    "building": 23,
+                    "valid_from": '2017-05-05',
+                    "valid_to": '2017-06-05',
+                    "schedule": {
+                        "lunes": ['08:00', '08:30'],
+                        "miercoles": ['11:00', '19:45']
+                    }
+                }
+            ],
             planillones:[],
 
 
@@ -44,7 +61,7 @@ class Contenedor extends Component{
         this.cargarPlanillones = this.cargarPlanillones.bind(this);
 
         this.db = new DBHandler();
-        this.db.pedir_planillones(this.cargarPlanillones);
+        //this.db.pedir_planillones(this.cargarPlanillones);
     }
 
     cargarPlanillones(datos){
@@ -248,9 +265,11 @@ class Horarios extends Component{
 
     cargarPlanillones(){
         let lista = [];
-        for (let x = 0; x < this.state.horarios; x++){
+        console.log(this.state.horarios)
+        for (let x = 0; x < this.state.horarios.length; x++){
             let tab = (<Tab label={this.state.horarios[x].building} key={x} value={this.state.horarios[x].building}> 
-                <HorarioSemanal semana={this.state.horarios[x].schedule} />
+                <HorarioSemanal semana={this.state.horarios[x].schedule} desde={this.state.horarios[x].valid_from}
+                hasta={this.state.horarios[x].valid_to} />
                 <br/>
                 <RaisedButton label={<label>Eliminar Planillon</label>} secondary={true} style={{float:'right'}} />
             </Tab>);
@@ -290,11 +309,12 @@ class HorarioSemanal extends Component{
         }
         this.cambiarIngreso = this.cambiarIngreso.bind(this);
         this.cambiarSalida = this.cambiarSalida.bind(this);
+        this.actualizarFechas = this.actualizarFechas.bind(this);
     }
 
     actualizarFechas(evento){
         this.setState({
-            
+            [evento.target.name]:evento.target.value
         })
     }
 
@@ -324,13 +344,20 @@ class HorarioSemanal extends Component{
         if(!datos) return;
 
         let lista = dias.map((elem,index)=>{
-            if(elem in datos)
-            <div style={{width:'350px', marginLeft:'5px'}} key={index.toString()} >
+            let entrada = '';
+            let salida = '';
+            console.log(datos)
+            if(elem.toLocaleLowerCase() in datos){
+                console.log('entra')
+                entrada = datos[elem.toLocaleLowerCase()][0];
+                salida = datos[elem.toLocaleLowerCase()][1];
+            }
+            return(<div style={{width:'350px', marginLeft:'5px'}} key={index.toString()} >
                 <span style={{width:'100px',display:'inline-block'}} >{dias[index]} :</span>
-                <TextField value={elem[0]} onChange={this.cambiarIngreso} name={index.toString()} type='time' style={{width:'80px'}}/>
-                -
-                <TextField value={elem[1]} onChange={this.cambiarSalida} name={index.toString()} type='time' style={{width:'80px'}}/>
-            </div>    
+                <TextField value={entrada} onChange={this.cambiarIngreso} name={index.toString()} type='time' style={{width:'80px'}}/>
+                <label htmlFor="" style={{width:40,display:'inline-block'}}>-</label>
+                <TextField value={salida} onChange={this.cambiarSalida} name={index.toString()} type='time' style={{width:'80px'}}/>
+            </div>)   
         }
     )
         return lista;
@@ -338,12 +365,15 @@ class HorarioSemanal extends Component{
 
 
     render(){
-
+        console.log(this.state.hasta)
         return(
             <div>
                 <label htmlFor="">Valido: </label>
                 <TextField floatingLabelText={ <label htmlFor="">Desde</label> } value={this.state.desde}
-                on/>
+                onChange={this.actualizarFechas} name='desde' type='date' style={{width:145}} />
+                <TextField floatingLabelText={ <label htmlFor="">Hasta</label> } value={this.state.hasta}
+                onChange={this.actualizarFechas} name='hasta' type='date'  style={{width:145}} />
+                <br/>
                 {this.generarSemana()}
             </div>
         )
@@ -366,11 +396,10 @@ class AgregarPlanillon extends Component{
         this.actualizarVariables = this.actualizarVariables.bind(this);
         this.db = new DBHandler();
         this.cargarPlanillones = this.cargarPlanillones.bind(this);
-        this.db.pedir_planillones(this.cargarPlanillones)
+        //this.db.pedir_planillones(this.cargarPlanillones)
     }
 
     cargarPlanillones(datos){
-        console.log(datos);
         let planillones =datos.buildings;
         let nombres = {};
         let codigos = {};
