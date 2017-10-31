@@ -33,12 +33,20 @@ export default class DBHandler{
         }
     }
 
+    actualizar_articulo(fun,datos){
+        this.enviarPeticion(fun,'api/0.1/articles/'+datos.code,'PUT',datos,true);
+    }
+
+    pedir_planillones(fun){
+        this.enviarPeticion(fun,'api/0.1/buildings','GET',null,true);
+    }
+
     pedir_articulo(fun,articulo){
         this.enviarPeticion(fun,'api/0.1/articles/'+articulo,'GET',null,true);
     }
 
     pedir_articulos(fun){
-        this.enviarPeticion(fun,'api/0.1/articles','GET',null,null);
+        this.enviarPeticion(fun,'api/0.1/articles','GET',null,false);
     }
 
     pedir_nombre(fun,legajo){

@@ -27,11 +27,7 @@ class Contenedor extends Component{
 
         this.state = {
             articulos:[
-            ], //lista de diccionarios. diccionario:{
-                //'nombre', 
-                //'letra',
-                //'id'
-                //}
+            ], 
             actual:'', //cliente a mostrar
             mostrarEdicion:false,
             filtro:'',
@@ -39,12 +35,12 @@ class Contenedor extends Component{
 
         this.db = new DBHandler();
         this.cargarArticulos = this.cargarArticulos.bind(this);
-        this.pedirArtoculos = this.pedirArtoculos.bind(this);
+        this.pedirArticulos = this.pedirArticulos.bind(this);
         this.actualizarDatos = this.actualizarDatos.bind(this);
-        this.pedirArtoculos();
     }
 
     actualizarDatos(valor,campo){
+        
         let dic = {[campo]:valor};
         if(campo === 'actual'){
             dic['mostrarEdicion'] = true;
@@ -52,24 +48,29 @@ class Contenedor extends Component{
         this.setState(dic)
     }
 
-    pedirArtoculos(){
+    pedirArticulos(){
         this.db.pedir_articulos(this.cargarArticulos);
     }
 
     cargarArticulos(datos){
+        this.setState({articulos:datos.articles});
 
-        this.setState({clientes:datos});
+    }
 
+    componentDidMount(){
+        if(this.state.articulos.length === 0){
+            this.pedirArticulos();
+        }
     }
 
     generarListado(){
 
         let lista = this.state.articulos;
-
+        console.log(lista);
         return lista.map((elem,index)=>
             {
-                if( elem.nombre.toLowerCase().includes(this.state.filtro.toLowerCase()) || this.state.filtro === ''){return <Articulo nombre={elem.nombre} 
-                codigo={elem.codigo} id={elem.codigo} 
+                if( elem[1].toLowerCase().includes(this.state.filtro.toLowerCase()) || this.state.filtro === ''){return <Articulo nombre={elem[1]} 
+                codigo={elem[0]} id={elem[0]} 
                 funAct={this.actualizarDatos} key={index}/>}
             }
         )
@@ -77,7 +78,7 @@ class Contenedor extends Component{
 
 
     render(){
-        let edicion = <CreacionConcepto actLista={this.pedirArtoculos} articulo={this.state.actual} />;
+        let edicion = <CreacionConcepto actLista={this.pedirArticulos} articulo={this.state.actual} />;
         if( this.state.mostrarEdicion === false){
             edicion = null;
         }
@@ -123,7 +124,7 @@ class Articulo extends Component{
     componentWillReceiveProps(props){
         this.setState({
             nombre:props.nombre,
-            letra:props.letra,
+            codigo:props.codigo,
             id:props.id
         })
     }
@@ -132,7 +133,7 @@ class Articulo extends Component{
         return(
             <ListItem onClick={()=>this.actualizarPadre(this.state.id,'actual')} >
                 <Avatar>
-                    {this.state.letra}
+                    {this.state.codigo}
                 </Avatar>
                 <span>
                     {this.state.nombre}

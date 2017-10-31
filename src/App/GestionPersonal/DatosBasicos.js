@@ -34,21 +34,21 @@ class Contenedor extends Component{
             anios25:false,
             premio:null,
             dependencia:'',
-            horarios:[
-                {
-                    building:23,
-                    valid_from:'20170505',
-                    valid_to:'20170605',
-                    schedule:{
-                        lunes:[8,8.5],
-                        miercoles:[11,19.35]
-                    }
-                }
-            ],
+            horarios:[],
+            planillones:[],
+
 
         }
         this.actualizarDatos = this.actualizarDatos.bind(this);
         this.actualizarHorarios = this.actualizarHorarios.bind(this);
+        this.cargarPlanillones = this.cargarPlanillones.bind(this);
+
+        this.db = new DBHandler();
+        this.db.pedir_planillones(this.cargarPlanillones);
+    }
+
+    cargarPlanillones(datos){
+        this.setState({planillones:datos.buildings});
     }
 
     actualizarDatos(dato,campo){
@@ -60,10 +60,9 @@ class Contenedor extends Component{
 
     render(){
         let horarios = null;
-        console.log(Object.keys(this.state.horarios).length)
-        if(Object.keys(this.state.horarios).length != 0){
-            horarios = <Horarios horarios={this.state.horarios} planillones={this.habilitarPlanillones}/>
-        }
+        
+        horarios = <Horarios horarios={this.state.horarios} planillones={this.state.planillones}/>
+        
         
 
         return (
@@ -354,6 +353,24 @@ class AgregarPlanillon extends Component{
         }
 
         this.actualizarVariables = this.actualizarVariables.bind(this);
+        this.db = new DBHandler();
+        this.cargarPlanillones = this.cargarPlanillones.bind(this);
+        this.db.pedir_planillones(this.cargarPlanillones)
+    }
+
+    cargarPlanillones(datos){
+        console.log(datos);
+        let planillones =datos.buildings;
+        let nombres = {};
+        let codigos = {};
+        for (let x = 0; x < planillones.length; x++ ){
+            nombres[planillones[x][1]]= planillones[x][0];
+            codigos[planillones[x][0]] = planillones[x][1];
+        }
+        this.setState({
+            planillones:nombres,
+            codigos:codigos
+        })
     }
 
     actualizarVariables(evento){

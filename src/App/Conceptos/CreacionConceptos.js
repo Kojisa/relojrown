@@ -61,6 +61,7 @@ export class CreacionConcepto extends Component{
         this.actualizarCheck = this.actualizarCheck.bind(this);
         this.guardarConcepto = this.guardarConcepto.bind(this);
         this.actualizarPadre = props.actLista;
+        this.cargarArticulo = this.cargarArticulo.bind(this);
 
 
     }
@@ -72,10 +73,11 @@ export class CreacionConcepto extends Component{
     }
 
     cargarArticulo(datos){
+        console.log(datos);
         this.setState({
             articulo:datos.code,
             descripcion:datos.description,
-            maxAnu:datos.month_min, //cambiar esto cuando lo arregle gaston.
+            maxAnu:datos.annual_max, //cambiar esto cuando lo arregle gaston.
             maxMen:datos.month_max,
             sexo:datos.sex,
             justifica:datos.justify,
@@ -85,16 +87,11 @@ export class CreacionConcepto extends Component{
         })
     }
 
-    componentWillReceviveProps(props){
+    componentWillReceiveProps(props){
         
         let art = this.state.articulo;
-        if (props.articulo && props.articulo != this.state.articulo && props.articulo != 'NUEVO'){
-            this.db.pedir_articulo(props.articulo);
-            this.setState({
-                articulo:props.articulo
-            })
-        }
-
+        console.log(props.articulo);
+        console.log(art);
         if(props.articulo === 'NUEVO'){
             this.setState({
                 articulo:'',
@@ -107,8 +104,13 @@ export class CreacionConcepto extends Component{
                 modArch:false,
                 justificaOtros:[],
             })
-            
+            return;   
         }
+        if (props.articulo  && props.articulo != 'NUEVO'){
+            this.db.pedir_articulo(this.cargarArticulo,1);
+        }
+
+        
 
         
     }
@@ -116,7 +118,7 @@ export class CreacionConcepto extends Component{
     componentDidMount(){
         let codigo = this.state.articulo;
         if(codigo && codigo != 'NUEVO'){
-            this.db.pedir_articulo(this.cargarArticulo);
+            this.db.pedir_articulo(this.cargarArticulo,1);
         }
     }
 
@@ -138,11 +140,19 @@ export class CreacionConcepto extends Component{
             'modify_article':this.state.modArch,
             'justify_list':this.state.justificaOtros,
         }
+        if(this.state.articulo === ''){
 
-        this.db.crear_articulo((datos)=>{
-            this.setState({articulo:datos.code})
-            this.actualizarPadre();},datos);
+            this.db.crear_articulo((datos)=>{
+                console.log(datos);
+                this.setState({articulo:datos.code});
+                this.actualizarPadre();},datos);
+    
+        }
+        else{
+            this.db.actualizar_articulo(this.actualizarPadre,datos);
+        }
 
+        
     }
 
 
@@ -159,11 +169,11 @@ export class CreacionConcepto extends Component{
                     <br/>
                     <TextField floatingLabelText={<label>Máximo Mensual</label>} name='maxMen' value={this.state.maxMen} onChange={this.actualizarValor} />
                     <br/>
-                    <Sexo actualizarPadre={this.actualizarValor}/>
+                    <Sexo actualizarPadre={this.actualizarValor} valor={this.state.sexo}/>
                     <br/>
                     <Checkbox label='Justifica' checked={this.state.justifica} name='justifica' onCheck={this.actualizarCheck} labelPosition='left'/>
                     <br/>
-                    <Dias actualizarPadre={this.actualizarValor}/>
+                    <Dias actualizarPadre={this.actualizarValor} valor={this.state.dias} />
                     <br/>
                     <Checkbox label='Modifica Archivo' checked={this.state.modArch} name='modArch' onCheck={this.actualizarCheck} labelPosition='left'/>
 
@@ -197,12 +207,18 @@ class Sexo extends Component{
         })
         this.actualizarPadre({target:{name:'sexo',value:valor}})
     }
+    
+    componentWillReceiveProps(props){
+        this.setState({
+            valor:props.valor,
+        })
+    }
 
     render(){
         return(
             <div>
                 <label>Sexo</label>
-                <RadioButtonGroup defaultSelected={this.state.valor} 
+                <RadioButtonGroup valueSelected={this.state.valor} 
                 labelPosition='left' style={{marginTop:'15px'}}
                 onChange={this.actualizarValor}>
                     <RadioButton label='Masculino' value='M'/>
@@ -226,19 +242,20 @@ class Dias extends Component{
     }
 
     actualizarValor(evento,valor){
-        this.setState({
-            valor:valor
-        })
         this.actualizarPadre({target:{name:'dias',value:valor}})
+    }
+    componentWillReceiveProps(props){
+        this.setState({
+            valor:props.valor,
+        })
     }
 
     render(){
         return(
             <div>
                 <label>Dias Hábiles/Corridos</label>
-                <RadioButtonGroup defaultSelected={this.state.valor} 
-                labelPosition='left' style={{marginTop:'15px'}}
-                onChange={this.actualizarValor} name='dias'>
+                <RadioButtonGroup labelPosition='left' style={{marginTop:'15px'}}
+                onChange={this.actualizarValor} name='dias' valueSelected={this.state.valor}>
                     <RadioButton label='Hábiles' value='W'/>
                     <RadioButton label='Corridos' value='A' />
                 </RadioButtonGroup>
