@@ -35,10 +35,15 @@ export class CreacionConcepto extends Component{
         if(!articulos){
             articulos={}
         }
+
+        let articulo = props.articulo;
+        if(!articulo || articulo.length === 0){
+            articulo = '';
+        }
         
         
         this.state={
-            articulo:'',
+            articulo:articulo,
             descripcion:'',
             maxAnu:'',
             maxMen:'',
@@ -55,6 +60,8 @@ export class CreacionConcepto extends Component{
         this.actualizarValor = this.actualizarValor.bind(this);
         this.actualizarCheck = this.actualizarCheck.bind(this);
         this.guardarConcepto = this.guardarConcepto.bind(this);
+        this.actualizarPadre = props.actLista;
+
 
     }
 
@@ -62,6 +69,55 @@ export class CreacionConcepto extends Component{
         this.setState({
             [evento.target.name]:evento.target.value
         })
+    }
+
+    cargarArticulo(datos){
+        this.setState({
+            articulo:datos.code,
+            descripcion:datos.description,
+            maxAnu:datos.month_min, //cambiar esto cuando lo arregle gaston.
+            maxMen:datos.month_max,
+            sexo:datos.sex,
+            justifica:datos.justify,
+            dias:datos.covers,
+            modArch:datos.modify_article,
+            justificaOtros:datos.justify_list,
+        })
+    }
+
+    componentWillReceviveProps(props){
+        
+        let art = this.state.articulo;
+        if (props.articulo && props.articulo != this.state.articulo && props.articulo != 'NUEVO'){
+            this.db.pedir_articulo(props.articulo);
+            this.setState({
+                articulo:props.articulo
+            })
+        }
+
+        if(props.articulo === 'NUEVO'){
+            this.setState({
+                articulo:'',
+                descripcion:'',
+                maxAnu:'',
+                maxMen:'',
+                sexo:'',
+                justifica:false,
+                dias:'',
+                modArch:false,
+                justificaOtros:[],
+            })
+            
+        }
+
+        
+    }
+
+    componentDidMount(){
+        let codigo = this.state.articulo;
+        if(codigo && codigo != 'NUEVO'){
+            this.db.pedir_articulo(this.cargarArticulo);
+        }
     }
 
     actualizarCheck(evento,checked){
@@ -75,14 +131,17 @@ export class CreacionConcepto extends Component{
             'code':this.state.articulo,
             'description':this.state.descripcion,
             'month_max':this.state.maxMen,
-            'month_min':this.state.maxAnu,
+            'annual_max':this.state.maxAnu,
             'sex':this.state.sexo,
             'justify':this.state.justifica,
             'covers':this.state.dias,
-            'modify_article':this.state.modArch
+            'modify_article':this.state.modArch,
+            'justify_list':this.state.justificaOtros,
         }
 
-        this.db.crear_articulo(null,datos);
+        this.db.crear_articulo((datos)=>{
+            this.setState({articulo:datos.code})
+            this.actualizarPadre();},datos);
 
     }
 

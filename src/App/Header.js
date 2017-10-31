@@ -12,6 +12,7 @@ import db from './DBHandler';
 import injectTapPlugin from 'react-tap-event-plugin';
 import MUICont from 'material-ui/styles/MuiThemeProvider';
 import {TextField,Paper,RaisedButton,AppBar,Drawer,List,ListItem} from 'material-ui';
+import listadoConceptos from './Conceptos/ListadoConceptos';
     
     
     class Nav extends React.Component{
@@ -47,6 +48,8 @@ import {TextField,Paper,RaisedButton,AppBar,Drawer,List,ListItem} from 'material
                 'funcion':muestraPresu},
                 {'nombre':'Bloquear Dependencias',
                 'funcion':bloquearDepend},
+                {'nombre':'Conceptos',
+                'funcion':listadoConceptos}
     
     
             ];
@@ -154,8 +157,8 @@ import {TextField,Paper,RaisedButton,AppBar,Drawer,List,ListItem} from 'material
         constructor(props){
             super(props);
             this.state = {
-                render:true,
-                loged:true,
+                render:false,
+                loged:false,
                 estadoNav:false,
             }
             this.logueado = this.logueado.bind(this);

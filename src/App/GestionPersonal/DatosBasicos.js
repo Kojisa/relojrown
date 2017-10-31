@@ -34,7 +34,17 @@ class Contenedor extends Component{
             anios25:false,
             premio:null,
             dependencia:'',
-            horarios:{'':[['',''],['',''],['',''],['',''],['',''],['',''],['',''],['','']]},
+            horarios:[
+                {
+                    building:23,
+                    valid_from:'20170505',
+                    valid_to:'20170605',
+                    schedule:{
+                        lunes:[8,8.5],
+                        miercoles:[11,19.35]
+                    }
+                }
+            ],
 
         }
         this.actualizarDatos = this.actualizarDatos.bind(this);
@@ -91,7 +101,7 @@ class DatosBasicos extends Component{
             anios25:props.anios25,
             premio:props.premio,
             dependencia:props.dependencia,
-            dependencias:[],
+            dependencias:[''],
             dependenciasCodigo:{},
             codigoDependencias:{},
         }
@@ -103,7 +113,7 @@ class DatosBasicos extends Component{
         this.buscarNombre = this.buscarNombre.bind(this);
         this.db = new DBHandler();
 
-        this.db.pedir_todas_las_dependencias(this.cargarDependencias)
+        //this.db.pedir_todas_las_dependencias(this.cargarDependencias)
     }
 
     componentWillReceiveProps(props){
@@ -159,6 +169,14 @@ class DatosBasicos extends Component{
     }
 
     render(){
+
+        let dependencia = null;
+        if(this.state.dependencias.length != 0){
+            dependencia = <AutoComplete floatingLabelText={ <label htmlFor="">Dependencia(Horas Extras)</label> } 
+            searchText={this.state.dependencia} dataSource={this.state.dependencias} 
+            />
+        }
+
         return(
             <div style={{width:'350px',display:'inline-block'}} >
                 <div style={{marginLeft:'15px'}}>
@@ -172,7 +190,7 @@ class DatosBasicos extends Component{
                     <Checkbox label={<label>25 Años de servicio: </label>} checked={this.state.anios25} onCheck={this.actualizarCheck}
                      labelPosition='left' style={{paddingTop:'10px'}} />
                     <br/>
-                    <AutoComplete floatingLabelText={ <label htmlFor="">Dependencia</label> } value={this.state.dependencia}/>
+                    {dependencia}
                     <Premio funAct={this.actualizarPremio} premio={this.state.premio} />
                 </div>
             </div>
@@ -220,7 +238,8 @@ class Horarios extends Component{
     constructor(props){
         super(props);
         this.state={
-            horarios:props.horarios //formato clave = dependencia, lista de horarios
+            horarios:props.horarios, //formato clave = dependencia, lista de horarios
+            planillones:props.planillones,
         }
         this.habilitarPlanillones = props.habilitarPlanillones;
     }
@@ -230,9 +249,9 @@ class Horarios extends Component{
 
     cargarPlanillones(){
         let lista = [];
-        for (let planillon in this.state.horarios){
-            let tab = (<Tab label={planillon} key={planillon} value={planillon}> 
-                <HorarioSemanal semana={this.state.horarios[planillon]} />
+        for (let x = 0; x < this.state.horarios; x++){
+            let tab = (<Tab label={this.state.horarios[x].building} key={x} value={this.state.horarios[x].building}> 
+                <HorarioSemanal semana={this.state.horarios[x].schedule} />
                 <br/>
                 <RaisedButton label={<label>Eliminar Planillon</label>} secondary={true} style={{float:'right'}} />
             </Tab>);
@@ -297,14 +316,16 @@ class HorarioSemanal extends Component{
         let dias = ['Lunes','Martes','Miercoles','Jueves','Viernes','Sabado','Domingo','Feriados']
         if(!datos) return;
 
-        let lista = datos.map((elem,index)=>(
+        let lista = dias.map((elem,index)=>{
+            if(elem in datos)
             <div style={{width:'350px', marginLeft:'5px'}} key={index.toString()} >
                 <span style={{width:'100px',display:'inline-block'}} >{dias[index]} :</span>
                 <TextField value={elem[0]} onChange={this.cambiarIngreso} name={index.toString()} type='time' style={{width:'80px'}}/>
                 -
                 <TextField value={elem[1]} onChange={this.cambiarSalida} name={index.toString()} type='time' style={{width:'80px'}}/>
             </div>    
-        ))
+        }
+    )
         return lista;
     }
 

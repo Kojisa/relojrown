@@ -1,7 +1,7 @@
 export default class DBHandler{
     
-    PORT = ":5000";// ":8000";
-    HOST = '0.0.0.0'//"172.20.0.3";
+    PORT = ":8000";// ":8000";
+    HOST = 'localhost'//"172.20.0.3";
 
     RUTABASICA = 'api/0.1/'
 
@@ -31,6 +31,14 @@ export default class DBHandler{
             datos['repeticion'] += 1;
             this.enviarPeticion(()=>{this.actualizar_limite(fun,datos)},'api/0.1/budget','POST',armarDatos,true);
         }
+    }
+
+    pedir_articulo(fun,articulo){
+        this.enviarPeticion(fun,'api/0.1/articles/'+articulo,'GET',null,true);
+    }
+
+    pedir_articulos(fun){
+        this.enviarPeticion(fun,'api/0.1/articles','GET',null,null);
     }
 
     pedir_nombre(fun,legajo){

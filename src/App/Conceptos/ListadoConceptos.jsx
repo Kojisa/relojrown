@@ -77,7 +77,7 @@ class Contenedor extends Component{
 
 
     render(){
-        let edicion = null;
+        let edicion = <CreacionConcepto actLista={this.pedirArtoculos} articulo={this.state.actual} />;
         if( this.state.mostrarEdicion === false){
             edicion = null;
         }
