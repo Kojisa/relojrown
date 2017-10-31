@@ -122,6 +122,8 @@ import listadoConceptos from './Conceptos/ListadoConceptos';
             if('error' in datos){
                 return;
             }
+            document.cookie = "auth_token="+datos["auth_token"];
+            document.cookie =  'username='+this.state.us;
             this.state.onLogin()
         }
     
@@ -168,7 +170,8 @@ import listadoConceptos from './Conceptos/ListadoConceptos';
     
     
         ver_cookie(datos){
-            document.cookie = "auth="+datos["token"] + ";";
+            console.log(datos);
+            document.cookie = "auth="+datos["auth_token"] + ";";
             this.setState({render:true});
         }
         cambiarEstadoNav(){

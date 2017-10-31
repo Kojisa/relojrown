@@ -82,7 +82,7 @@ export default class DBHandler{
         var request = new XMLHttpRequest();
         request.onreadystatechange = function(){
             if(this.readyState == 4 && this.status == 200){
-
+                
                 if (fun != null){
                     if (this.responseText.length > 0){
                         fun(JSON.parse(this.responseText));
