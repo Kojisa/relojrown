@@ -284,10 +284,18 @@ class HorarioSemanal extends Component{
 
         this.state={
             semana:props.semana,
-            dependencia:props.dependencia
+            dependencia:props.dependencia,
+            desde:props.desde,
+            hasta:props.hasta
         }
         this.cambiarIngreso = this.cambiarIngreso.bind(this);
         this.cambiarSalida = this.cambiarSalida.bind(this);
+    }
+
+    actualizarFechas(evento){
+        this.setState({
+            
+        })
     }
 
     cambiarIngreso(evento){
@@ -333,7 +341,10 @@ class HorarioSemanal extends Component{
 
         return(
             <div>
-             {this.generarSemana()}
+                <label htmlFor="">Valido: </label>
+                <TextField floatingLabelText={ <label htmlFor="">Desde</label> } value={this.state.desde}
+                on/>
+                {this.generarSemana()}
             </div>
         )
 
