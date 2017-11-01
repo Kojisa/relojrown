@@ -75,7 +75,7 @@ export default class DBHandler{
         this.enviarPeticion(fun,'api/0.1/dependencies/blacklist','POST',{'blacklist':[codigo]})
     }
     desbloquear_dependencia(fun,codigo){
-        this.enviarPeticion(fun,'api/0.1/dependencies/unblackedlist','POST',{'blacklist':[codigo]})
+        this.enviarPeticion(fun,'api/0.1/dependencies/unblacklist','POST',{'blacklist':[codigo]})
     }
 
     pedir_todas_las_dependencias(fun){

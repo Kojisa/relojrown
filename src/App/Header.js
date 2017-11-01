@@ -48,8 +48,6 @@ import listadoConceptos from './Conceptos/ListadoConceptos';
                 'funcion':bloquearDepend},
                 {'nombre':'Conceptos',
                 'funcion':listadoConceptos}
-    
-    
             ];
     
             return lista;
