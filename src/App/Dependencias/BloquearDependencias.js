@@ -53,9 +53,9 @@ class Contenedor extends Component{
     ajustarDependencias(datos){
         console.log(datos);
         let depen = datos['dependencies'].concat(datos['sub-dependencies']);
-        
+        //
         for (let x = 0; x < depen.length; x++){
-            this.state.dic[depen[0]][3] = true;
+            this.state.dic[depen[x][0]][3] = true;
         }
         
 
@@ -70,7 +70,7 @@ class Contenedor extends Component{
         todas.map((elem)=>{if(elem.length == 2){elem.push(null);}elem.push(false);elem.push(false)});
         todas.sort((a,b)=>{return a[1].localeCompare(b[1])});
         let dic = {};
-        todas.map((elem)=>(dic[elem[0]]=elem));
+        todas.map((elem,index)=>(dic[elem[0]]=index));
         this.setState({dependencias:todas,dic:dic});
         let db = new dbHandler();
         db.pedir_dependencias_bloqueadas(this.ajustarDependencias);
