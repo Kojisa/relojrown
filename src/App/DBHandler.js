@@ -33,6 +33,14 @@ export default class DBHandler{
         }
     }
 
+    guardar_horario(datos,legajo){
+        this.enviarPeticion((datos)=>(console.log(datos)),'api/0.1/schedule/'+legajo,'POST',datos,true);
+    }
+
+    pedir_horarios_persona(fun,legajo){
+        this.enviarPeticion(fun,'api/0.1/schedule/'+legajo,'GET',null,true);
+    }
+
     actualizar_articulo(fun,datos){
         this.enviarPeticion(fun,'api/0.1/articles/'+datos.code,'PUT',datos,true);
     }

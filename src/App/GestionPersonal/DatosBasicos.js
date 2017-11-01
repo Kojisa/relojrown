@@ -34,34 +34,52 @@ class Contenedor extends Component{
             anios25:false,
             premio:null,
             dependencia:'',
-            horarios:[{
-                "building": 24,
-                "valid_from": '2017-05-05',
-                "valid_to": '2017-06-05',
-                "schedule": {
-                    "lunes": ['09:00', '12:00'],
-                    "jueves": ['11:00', '19:00']
-                    }
-                },{
-                    "building": 23,
-                    "valid_from": '2017-05-05',
-                    "valid_to": '2017-06-05',
-                    "schedule": {
-                        "lunes": ['08:00', '08:30'],
-                        "miercoles": ['11:00', '19:45']
-                    }
-                }
-            ],
+            horarios:[],
             planillones:[],
+            cambioAnios:false,
+            cambioTipoAsist:false,
+            cambioPremio:false,
+            cambioHorarios:false,
+            cambiodependencia:false,
 
 
         }
         this.actualizarDatos = this.actualizarDatos.bind(this);
         this.actualizarHorarios = this.actualizarHorarios.bind(this);
         this.cargarPlanillones = this.cargarPlanillones.bind(this);
+        this.cargarHorarios = this.cargarHorarios.bind(this);
+        this.pedirDatos = this.pedirDatos.bind(this);
+        this.agregarPlanillon = this.agregarPlanillon.bind(this);
+        this.enviarDatos = this.enviarDatos.bind(this);
 
         this.db = new DBHandler();
-        //this.db.pedir_planillones(this.cargarPlanillones);
+        
+        this.db.pedir_planillones(this.cargarPlanillones);
+    }
+
+    agregarPlanillon(planillon){
+        let horarios = this.state.horarios;
+        horarios.push({
+            schedule:{},
+            valid_to:'',
+            valid_from:'',
+            building:2,
+            nuevo:true,
+            modificado:true,
+
+        })
+        this.setState({horarios:horarios,cambioHorarios:true});
+    }
+
+    cargarHorarios(datos){
+
+        console.log(datos);
+        for (let  x = 0; x < datos.schedules.length; x++){
+            datos.schedule[x]['nuevo'] = false;
+            datos.schedule[x]['modificado'] = false;
+        }
+        this.setState({horarios:datos.schedules,
+        cambioHorarios:false});
     }
 
     cargarPlanillones(datos){
@@ -69,23 +87,69 @@ class Contenedor extends Component{
     }
 
     actualizarDatos(dato,campo){
-        this.setState({[campo]:dato});
+        if(campo == 'legajo'){
+            this.setState({
+                legajo:dato,
+                persona:'',//nombre asociado al legajo
+                tipoAsistencia:null,
+                anios25:false,
+                premio:null,
+                dependencia:'',
+                horarios:[],
+                planillones:[],
+                cambioAnios:false,
+                cambioTipoAsist:false,
+                cambioPremio:false,
+                cambioHorarios:false,
+                cambiodependencia:false,
+            })
+        }
+        else{
+            this.setState({[campo]:dato});
+        }
     }
 
-    actualizarHorarios(){
+    pedirDatos(){
+        if(this.state.legajo != ''){
+            this.db.pedir_horarios_persona(this.cargarHorarios,this.state.legajo);
+            this.db.pedir_nombre((dato)=>(this.setState({persona:dato.name})),this.state.legajo)
+        }
+    }
+
+    actualizarHorarios(pos,info){
+        let horarios = this.state.horarios;
+        horarios[pos] = info;
+        this.setState({
+            horarios:horarios,
+            cambioHorarios:true
+        });
+    }
+
+    enviarDatos(){
+        if(this.state.cambioHorarios){
+            let horarios = this.state.horarios;
+            for(let x = 0; x < horarios.length; x++){
+                if(horarios[x]['nuevo']){
+                    this.db.guardar_horario(horarios[x],this.state.legajo);
+                }
+            }
+        }
     }
 
     render(){
         let horarios = null;
         
-        horarios = <Horarios horarios={this.state.horarios} planillones={this.state.planillones}/>
+        horarios = <Horarios horarios={this.state.horarios} planillones={this.state.planillones}
+        funAct={this.actualizarHorarios} funAgregar={this.agregarPlanillon}/>
         
         
 
         return (
             <div >
                 <div style={{display:'inline-block',margin:'5px'}}>
-                    <DatosBasicos funAct={this.actualizarDatos} persona={this.state.persona}
+                    <DatosBasicos funAct={this.actualizarDatos} 
+                    pedirDatos={this.pedirDatos}
+                    persona={this.state.persona}
                     tipoAsistencia={this.state.tipoAsistencia}
                     anios25={this.state.anios25}
                     premio={this.state.premio}
@@ -97,7 +161,7 @@ class Contenedor extends Component{
                     {horarios}
                 </div>
                 <div style={{float:'bottom',margin:'5px'}}>
-                <RaisedButton label={<label>Actualizar Perfil</label>} primary={true}/>
+                <RaisedButton label={<label>Actualizar Perfil</label>} primary={true} onClick={this.enviarDatos}/>
                 </div>
             </div>
         )
@@ -117,11 +181,13 @@ class DatosBasicos extends Component{
             anios25:props.anios25,
             premio:props.premio,
             dependencia:props.dependencia,
-            dependencias:[''],
+            dependencias:[],
             dependenciasCodigo:{},
             codigoDependencias:{},
         }
         this.actualizarPadre = props.funAct;
+        this.pedirDatos = props.pedirDatos;
+        this.cargarDependencias = this.cargarDependencias.bind(this);
         this.actualizarDatos = this.actualizarDatos.bind(this);
         this.actualizarTipoAsist = this.actualizarTipoAsist.bind(this);
         this.actualizarCheck = this.actualizarCheck.bind(this);
@@ -129,7 +195,7 @@ class DatosBasicos extends Component{
         this.buscarNombre = this.buscarNombre.bind(this);
         this.db = new DBHandler();
 
-        //this.db.pedir_todas_las_dependencias(this.cargarDependencias)
+        this.db.pedir_todas_las_dependencias(this.cargarDependencias)
     }
 
     componentWillReceiveProps(props){
@@ -144,10 +210,10 @@ class DatosBasicos extends Component{
         let listaFinal = [];
         let dependenciasCodigo = {};
         let codigoDependencias = {};
-        for (let x = 0; x < datos['dependencies'].length; x++){
-            listaFinal.push[datos['dependencies'][1]];
-            dependenciasCodigo[datos['dependencies'][1]] = datos['dependencies'][0]; //para tener la referencia de que rependencia es.
-            codigoDependencias[datos['dependencies'][0]] = datos['dependencies'][1];
+        for (let x = 0; x < datos.dependencies.length; x++){
+            listaFinal.push(datos['dependencies'][x][1]);
+            dependenciasCodigo[datos['dependencies'][x][1]] = datos['dependencies'][x][0]; //para tener la referencia de que rependencia es.
+            codigoDependencias[datos['dependencies'][x][0]] = datos['dependencies'][x][1];
         }
         this.setState({dependencias:listaFinal,dependenciasCodigo:dependenciasCodigo,codigoDependencias:codigoDependencias});
     }
@@ -167,8 +233,9 @@ class DatosBasicos extends Component{
     }
 
     buscarNombre(){
-        let db = new DBHandler();
-        db.pedir_nombre((dato)=>(this.setState({persona:dato.name})),this.state.legajo)
+        this.pedirDatos();
+        //let db = new DBHandler();
+        //db.pedir_nombre((dato)=>(this.setState({persona:dato.name})),this.state.legajo)
     }
 
     actualizarTipoAsist(evento,key,valor){
@@ -256,26 +323,30 @@ class Horarios extends Component{
         this.state={
             horarios:props.horarios, //formato clave = dependencia, lista de horarios
             planillones:props.planillones,
+            
         }
+        this.actualizarHorario = props.funAct;
         this.habilitarPlanillones = props.habilitarPlanillones;
+        this.funAgregar = props.funAgregar;
     }
+    
 
     agregarPlanillon(){
     }
 
     cargarPlanillones(){
         let lista = [];
-        console.log(this.state.horarios)
         for (let x = 0; x < this.state.horarios.length; x++){
             let tab = (<Tab label={this.state.horarios[x].building} key={x} value={this.state.horarios[x].building}> 
-                <HorarioSemanal semana={this.state.horarios[x].schedule} desde={this.state.horarios[x].valid_from}
-                hasta={this.state.horarios[x].valid_to} />
+                <HorarioSemanal funAct={this.actualizarHorario} semana={this.state.horarios[x].schedule} desde={this.state.horarios[x].valid_from}
+                hasta={this.state.horarios[x].valid_to} orden={x} dependencia={this.state.horarios[x].building}
+                nuevo={this.state.horarios[x].nuevo} modificado={this.state.horarios[x].modificado} />
                 <br/>
                 <RaisedButton label={<label>Eliminar Planillon</label>} secondary={true} style={{float:'right'}} />
             </Tab>);
             lista.push(tab);
         }
-        lista.push(<Tab onActive={this.agregarPlanillon} label={<lable>+</lable>} key='+'> <AgregarPlanillon/> </Tab>);
+        lista.push(<Tab onActive={this.agregarPlanillon} label={<lable>+</lable>} key='+'  > <AgregarPlanillon funAgregar={this.funAgregar}/> </Tab>);
         return lista;
 
     }
@@ -304,37 +375,115 @@ class HorarioSemanal extends Component{
         this.state={
             semana:props.semana,
             dependencia:props.dependencia,
-            desde:props.desde,
-            hasta:props.hasta
+            desde:props.desde.split(',')[1],
+            hasta:props.hasta.split(',')[1],
+            orden:props.orden,
+            modificado:props.modificado,
+            nuevo:props.nuevo
         }
+        this.actualizarHorario = props.funAct;
         this.cambiarIngreso = this.cambiarIngreso.bind(this);
         this.cambiarSalida = this.cambiarSalida.bind(this);
         this.actualizarFechas = this.actualizarFechas.bind(this);
+        this.actualizarPadre = this.actualizarPadre.bind(this);
     }
 
-    actualizarFechas(evento){
+    componentWillReceiveProps(props){
         this.setState({
-            [evento.target.name]:evento.target.value
+            semana:props.semana,
+            dependencia:props.dependencia,
+            desde:props.desde,
+            hasta:props.hasta,
+            orden:props.orden,
+            modificado:props.modificado,
+            nuevo:props.nuevo
+            
         })
+    }
+
+    actualizarPadre(estado){
+        let dic = {
+            schedule:estado.semana,
+            valid_to:estado.hasta,
+            valid_from:estado.desde,
+            building:estado.dependencia,
+            modificado:true,
+            nuevo:estado.nuevo,
+        }
+        this.actualizarHorario(this.state.orden,dic);
+    }
+
+    pasarHoraNumero(string){
+        let hora = parseInt(string[0]+string[1]);
+        let minutos = parseInt(string[3]+string[4]);
+        minutos = (minutos/60)
+        let final = hora + minutos;
+        final = final.toFixed(2);
+        return final;
+    }
+
+
+    actualizarFechas(evento){
+        let estado = this.state;
+        estado[evento.target.name]=evento.target.value;
+        this.actualizarPadre(estado);
     }
 
     cambiarIngreso(evento){
         let dato = evento.target.value;
-        let indice = parseInt(evento.target.name);
+        let indice = evento.target.name;
 
         let horarios = this.state.semana;
-        horarios[indice][0] = dato;
-        this.setState({'semana':horarios});
+        if(! (indice in horarios) ){
+            horarios[indice]=[,];
+        }
+        
+        horarios[indice][0] = this.pasarHoraNumero(dato);
+        let estado = this.state;
+        estado.semana = horarios;
+        this.actualizarPadre(estado);
 
 
     }
     cambiarSalida(evento){
         let dato = evento.target.value;
-        let indice = parseInt(evento.target.name);
+        let indice = evento.target.name;
 
         let horarios = this.state.semana;
-        horarios[indice][1] = dato;
-        this.setState({'semana':horarios});
+        if(! (indice in horarios) ){
+            horarios[indice]=[,];
+        }
+        horarios[indice][1] = this.pasarHoraNumero(dato);
+        let estado = this.state;
+        estado.semana = horarios;
+        this.actualizarPadre(estado);
+
+    }
+
+    transformarHora(numero){
+        if(!numero){return ''}
+        let horaFinal = '';
+        let hora = numero.toString().split('.');
+        
+        if(hora[0].length == 1){
+            horaFinal ='0' + hora[0];
+        }
+        else if(hora[0].length == 2){
+            horaFinal = hora[0]
+        }
+        if(hora.length === 1){
+            horaFinal += ':00';
+        }
+        else{
+            let minutos = parseFloat('0.'+hora[1]);
+            minutos = (60*(minutos)).toFixed(0).toString();
+            if(minutos.length == 1){
+                minutos = '0'+minutos;
+            }
+            horaFinal += ':' + minutos;
+        }
+        return horaFinal;
+
 
     }
 
@@ -346,17 +495,18 @@ class HorarioSemanal extends Component{
         let lista = dias.map((elem,index)=>{
             let entrada = '';
             let salida = '';
-            console.log(datos)
+           
             if(elem.toLocaleLowerCase() in datos){
-                console.log('entra')
-                entrada = datos[elem.toLocaleLowerCase()][0];
-                salida = datos[elem.toLocaleLowerCase()][1];
+                
+                entrada = this.transformarHora(datos[elem.toLocaleLowerCase()][0]);
+                salida = this.transformarHora(datos[elem.toLocaleLowerCase()][1]);
+                
             }
             return(<div style={{width:'350px', marginLeft:'5px'}} key={index.toString()} >
                 <span style={{width:'100px',display:'inline-block'}} >{dias[index]} :</span>
-                <TextField value={entrada} onChange={this.cambiarIngreso} name={index.toString()} type='time' style={{width:'80px'}}/>
+                <TextField value={entrada} onChange={this.cambiarIngreso} name={elem.toLowerCase()} type='time' style={{width:'80px'}}/>
                 <label htmlFor="" style={{width:40,display:'inline-block'}}>-</label>
-                <TextField value={salida} onChange={this.cambiarSalida} name={index.toString()} type='time' style={{width:'80px'}}/>
+                <TextField value={salida} onChange={this.cambiarSalida} name={elem.toLowerCase()} type='time' style={{width:'80px'}}/>
             </div>)   
         }
     )
@@ -365,7 +515,6 @@ class HorarioSemanal extends Component{
 
 
     render(){
-        console.log(this.state.hasta)
         return(
             <div>
                 <label htmlFor="">Valido: </label>
@@ -393,10 +542,12 @@ class AgregarPlanillon extends Component{
             nombre:'',
         }
 
+        this.agregarPlanillon = props.funAgregar;
         this.actualizarVariables = this.actualizarVariables.bind(this);
         this.db = new DBHandler();
         this.cargarPlanillones = this.cargarPlanillones.bind(this);
-        //this.db.pedir_planillones(this.cargarPlanillones)
+        this.generarPlanillon = this.generarPlanillon.bind(this);
+        this.db.pedir_planillones(this.cargarPlanillones)
     }
 
     cargarPlanillones(datos){
@@ -411,6 +562,11 @@ class AgregarPlanillon extends Component{
             planillones:nombres,
             codigos:codigos
         })
+    }
+
+
+    generarPlanillon(){
+        this.agregarPlanillon(this.state.codigo);
     }
 
     actualizarVariables(evento){
@@ -433,27 +589,26 @@ class AgregarPlanillon extends Component{
                 })
             }
         }
-        else{
-            this.setState({[campo]:valor});
-        }
 
     }
 
     render(){
         return(
             <div style={{marginLeft:'5px',display:'inline-block'}}>
-                <AutoComplete floatingLabelText={<label>Codigo Planillon</label>} searchText={this.codigo} name='codigo' type='text'
+                <AutoComplete floatingLabelText={<label>Codigo Planillon</label>} searchText={this.state.codigo} name='codigo' type='text'
                 onBlur={this.actualizarVariables} onNewRequest={(elegido,indice)=>{
                     let evento = {target:{name:'codigo',value:elegido}};
                     this.actualizarVariables(evento);
                 }} dataSource={Object.keys(this.state.codigos).sort()}/>
-                <AutoComplete floatingLabelText={<label>Planillon</label>} searchText={this.codigo} name='codigo' type='text'
+                <AutoComplete floatingLabelText={<label>Planillon</label>} searchText={this.state.nombre} name='nombre' type='text'
                 onBlur={this.actualizarVariables} onNewRequest={(elegido,indice)=>{
-                    let evento = {target:{name:'codigo',value:elegido}};
+                    console.log(elegido);
+                    console.log(indice);
+                    let evento = {target:{name:'nombre',value:elegido}};
                     this.actualizarVariables(evento);
                 }} dataSource={Object.keys(this.state.planillones).sort()}/>
                 <br/>
-                <RaisedButton label='Elegir' style={{float:'right'}}/>
+                <RaisedButton label='Elegir' style={{float:'right'}} onClick={this.generarPlanillon}/>
             </div>
         )
     }

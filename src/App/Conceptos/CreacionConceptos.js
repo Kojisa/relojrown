@@ -37,7 +37,7 @@ export class CreacionConcepto extends Component{
         }
 
         let articulo = props.articulo;
-        if(!articulo || articulo.length === 0){
+        if(!articulo || articulo.length === 0 || articulo === 'NUEVO'){
             articulo = '';
         }
         

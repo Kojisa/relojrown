@@ -159,8 +159,8 @@ import listadoConceptos from './Conceptos/ListadoConceptos';
         constructor(props){
             super(props);
             this.state = {
-                render:true,
-                loged:true,
+                render:false,
+                loged:false,
                 estadoNav:false,
             }
             this.logueado = this.logueado.bind(this);

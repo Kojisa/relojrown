@@ -36,6 +36,7 @@ class Contenedor extends Component{
         this.cargarDependencias = this.cargarDependencias.bind(this);
         this.actualizar = this.actualizar.bind(this);
         this.ajustarDependencias = this.ajustarDependencias.bind(this);
+        this.actualizarDependencia = this.actualizarDependencia.bind(this);
         this.pedirDependencias();
     }
 
@@ -43,11 +44,20 @@ class Contenedor extends Component{
         this.setState({[campo]:valor});
     }
 
+    actualizarDependencia(indice,diccionario){
+        let dependencias = this.state.dependencias;
+        dependencias[indice] = diccionario;
+        this.setState({dependencias:dependencias})
+    }
+
     ajustarDependencias(datos){
+        console.log(datos);
         let depen = datos['dependencies'].concat(datos['sub-dependencies']);
+        
         for (let x = 0; x < depen.length; x++){
             this.state.dic[depen[0]][3] = true;
         }
+        
 
     }
 
@@ -80,7 +90,7 @@ class Contenedor extends Component{
             <div>
                 
                 <BarraFiltrado funAct={this.actualizar}/>
-                <Listado lista={this.state.dependencias} funAct={this.actualizar} filtrado={this.state.filtro}/>
+                <Listado lista={this.state.dependencias} funAct={this.actualizar} filtrado={this.state.filtro} actualizarDependencia={this.actualizarDependencia}/>
             </div>
         )
 
@@ -99,16 +109,13 @@ class Listado extends Component {
     }
     this.cargarListado = this.cargarListado.bind(this);
     this.actualizarPadre = props.funAct;
+    this.actualizarDependencia = props.actualizarDependencia;
   }
 
 
   componentWillReceiveProps(props){
 
     this.setState({lista:props.lista,filtrado:props.filtrado});
-  }
-
-  actualizarDependencia(monto,codigo){
-
   }
 
 
@@ -120,7 +127,7 @@ class Listado extends Component {
         if(listado[x][1].toLowerCase().includes(this.state.filtrado.toLowerCase())){
             final.push(
                 <Linea nombre={listado[x][1]} codigo={listado[x][0]}  bloqueado={listado[x][3]}
-                funAct={this.actualizarDependencia} actualizando={listado[x][4]} key={x}/>
+                 actualizando={listado[x][4]} key={x} orden={x} actualizar={this.actualizarDependencia}/>
             )
         }
     }
@@ -147,8 +154,10 @@ class Linea extends Component{
             nombre:props.nombre,
             codigo:props.codigo,
             bloqueado:props.bloqueado,
-            actualizando:props.actualizando
+            actualizando:props.actualizando,
+            orden:props.orden
         }
+        this.actualizar = props.actualizar;
         this.bloquear = this.bloquear.bind(this);
         this.desbloquear = this.desbloquear.bind(this);
     }
@@ -159,13 +168,15 @@ class Linea extends Component{
 
     desbloquear(){
         let db = new dbHandler();
-        db.desbloquear_dependencia(()=>(this.setState({actualizando:false,bloqueado:true})),this.state.codigo)
+        console.log(this.state.codigo)
+        db.desbloquear_dependencia((datos)=>(console.log(datos)),this.state.codigo)
     }
 
 
     bloquear(){
         let db = new dbHandler();
-        db.bloquear_dependencia(()=>(this.setState({actualizando:false,bloqueado:true})),this.state.codigo);
+        console.log(this.state.codigo)
+        db.bloquear_dependencia((datos)=>(console.log(datos)),this.state.codigo);
     }
 
 
@@ -181,8 +192,8 @@ class Linea extends Component{
     render(){
 
         let boton = <RaisedButton label='Bloquear' secondary={true} onClick={this.bloquear}/>
-        if(this.state.actualizando){
-            boton = <RaisedButton label='Desbloquear'  onClick={this.desbloquear}/>
+        if(this.state.bloqueado){
+            boton = <RaisedButton label='Desbloquear' primary={true} onClick={this.desbloquear}/>
         }
 
         return(
