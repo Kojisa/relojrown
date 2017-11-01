@@ -40,8 +40,6 @@ import listadoConceptos from './Conceptos/ListadoConceptos';
                 'funcion':ActualizacionInasistencias},
                 {'nombre':'Depuración de Licencias Anuales',
                 'funcion':DepuracionLicenciasAnuales},
-                {'nombre':'Creacion de Conceptos',
-                'funcion':CreacionConceptos},
                 {'nombre':'Limite Presupuestario',
                 'funcion':limitePresu},
                 {'nombre':'Muestra de Gastos',
