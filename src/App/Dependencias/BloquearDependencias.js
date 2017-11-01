@@ -51,19 +51,20 @@ class Contenedor extends Component{
     }
 
     ajustarDependencias(datos){
-        console.log(datos);
         let depen = datos['dependencies'].concat(datos['sub-dependencies']);
-        //
+        let dependencias = this.state.dependencias;
+        let ref = this.state.dic;
         for (let x = 0; x < depen.length; x++){
-            this.state.dic[depen[x][0]][3] = true;
+            let indice = ref[depen[x][0]];
+            dependencias[indice][3] = true
         }
+        this.setState({dependencias:dependencias});
         
 
     }
 
     cargarDependencias(datos){
         let todas = [];
-        console.log(datos)
         let depen = datos.dependencies;
         let subDep = datos['sub-dependencies'];
         todas = depen.concat(subDep);
@@ -126,7 +127,7 @@ class Listado extends Component {
     for(let x = 0; x < listado.length; x++){
         if(listado[x][1].toLowerCase().includes(this.state.filtrado.toLowerCase())){
             final.push(
-                <Linea nombre={listado[x][1]} codigo={listado[x][0]}  bloqueado={listado[x][3]}
+                <Linea nombre={listado[x][1]} codigo={listado[x][0]} padre={listado[x][2]}  bloqueado={listado[x][3]}
                  actualizando={listado[x][4]} key={x} orden={x} actualizar={this.actualizarDependencia}/>
             )
         }
@@ -153,6 +154,7 @@ class Linea extends Component{
         this.state={
             nombre:props.nombre,
             codigo:props.codigo,
+            padre:props.padre,
             bloqueado:props.bloqueado,
             actualizando:props.actualizando,
             orden:props.orden
@@ -168,15 +170,21 @@ class Linea extends Component{
 
     desbloquear(){
         let db = new dbHandler();
-        console.log(this.state.codigo)
-        db.desbloquear_dependencia((datos)=>(console.log(datos)),this.state.codigo)
+        db.desbloquear_dependencia(()=>(this.actualizar(this.state.orden,[
+            this.state.codigo,
+            this.state.nombre,
+            this.state.padre,
+            false,false])),this.state.codigo)
     }
 
 
     bloquear(){
         let db = new dbHandler();
-        console.log(this.state.codigo)
-        db.bloquear_dependencia((datos)=>(console.log(datos)),this.state.codigo);
+        db.bloquear_dependencia(()=>(this.actualizar(this.state.orden,[
+            this.state.codigo,
+            this.state.nombre,
+            this.state.padre,
+            true,false])),this.state.codigo);
     }
 
 
@@ -184,6 +192,7 @@ class Linea extends Component{
         this.setState({
             nombre:props.nombre,
             codigo:props.codigo,
+            padre:props.padre,
             bloqueado:props.bloqueado,
             actualizando:props.actualizando
         })
