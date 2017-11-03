@@ -73,7 +73,6 @@ class Contenedor extends Component{
 
     cargarHorarios(datos){
 
-        console.log(datos);
         for (let  x = 0; x < datos.schedules.length; x++){
             datos.schedule[x]['nuevo'] = false;
             datos.schedule[x]['modificado'] = false;
@@ -256,7 +255,7 @@ class DatosBasicos extends Component{
         let dependencia = null;
         if(this.state.dependencias.length != 0){
             dependencia = <AutoComplete floatingLabelText={ <label htmlFor="">Dependencia(Horas Extras)</label> } 
-            searchText={this.state.dependencia} dataSource={this.state.dependencias} 
+            searchText={this.state.dependencia} dataSource={this.state.dependencias} filter={AutoComplete.caseInsensitiveFilter} 
             />
         }
 

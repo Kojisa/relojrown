@@ -21,8 +21,6 @@ export default class DBHandler{
             'year': anio,
             'month':mes,
         }
-        console.log(armarDatos);
-        console.log(datos['repeticion'])
         if(datos.repeticion == 12){
             this.enviarPeticion(fun,'api/0.1/budget','POST',armarDatos,true);
         }

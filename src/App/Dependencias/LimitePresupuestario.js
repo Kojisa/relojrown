@@ -104,13 +104,19 @@ class Listado extends Component {
 
     let final = []; //listado final a mostrar
     let listado = this.state.lista;
+    let maximo = 30;
+    
     for(let x = 0; x < listado.length; x++){
         if(listado[x][1].toLowerCase().includes(this.state.filtrado.toLowerCase())){
             final.push(
                 <Linea nombre={listado[x][1]} codigo={listado[x][0]} monto={listado[x][2]} nuevoLimite={listado[x][3]} 
                 funAct={this.actualizarDependencia} actualizando={listado[x][4]} key={x}/>
             )
-        }
+            if(final.length === maximo){
+                break;
+            }
+        }    
+        
     }
     return final;
   }
