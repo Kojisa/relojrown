@@ -62,7 +62,10 @@ export default class DBHandler{
     pedir_dependencias_limite(fun){
         //this.enviarPeticion((datos)=>(console.log(datos)),'api/0.1/dependencies','GET');
         //this.enviarPeticion((datos)=>(console.log(datos)),'api/0.1/overtime','GET',{'initial_date':'20071009','end_date':'20081019'},true);
-        this.enviarPeticion(fun,'api/0.1/budget/'+2017+'/'+9,'GET',null,true);
+        let fecha = new Date();
+        let mes = fecha.getMonth() + 1;
+        let anio = fecha.getFullYear();
+        this.enviarPeticion(fun,'api/0.1/budget/'+anio+'/'+mes,'GET',null,true);
     }
 
     pedir_dependencias(fun){
