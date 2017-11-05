@@ -13,6 +13,7 @@ import injectTapPlugin from 'react-tap-event-plugin';
 import MUICont from 'material-ui/styles/MuiThemeProvider';
 import {TextField,Paper,RaisedButton,AppBar,Drawer,List,ListItem} from 'material-ui';
 import listadoConceptos from './Conceptos/ListadoConceptos';
+import AgregarHorarioManual from './GestionPersonal/CargaManualPresentismo';
     
     
     class Nav extends React.Component{
@@ -47,7 +48,9 @@ import listadoConceptos from './Conceptos/ListadoConceptos';
                 {'nombre':'Bloquear Dependencias',
                 'funcion':bloquearDepend},
                 {'nombre':'Conceptos',
-                'funcion':listadoConceptos}
+                'funcion':listadoConceptos},
+                {'nombre':'Carga Manual de Presentismo',
+                'funcion':AgregarHorarioManual},
             ];
     
             return lista;

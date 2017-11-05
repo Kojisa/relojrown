@@ -129,7 +129,15 @@ class Contenedor extends Component{
             let horarios = this.state.horarios;
             for(let x = 0; x < horarios.length; x++){
                 if(horarios[x]['nuevo']){
-                    this.db.guardar_horario(horarios[x],this.state.legajo);
+                    let dic={
+                        building:horarios[x].building,
+                        schedule:horarios[x].schedule,
+                        valid_from:horarios[x].valid_from,
+                        valid_to:horarios[x].valid_to,
+                    }
+                    console.log(dic);
+                    this.db.guardar_horario(dic,this.state.legajo);
+
                 }
             }
         }
