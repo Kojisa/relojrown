@@ -14,6 +14,8 @@ import MUICont from 'material-ui/styles/MuiThemeProvider';
 import {TextField,Paper,RaisedButton,AppBar,Drawer,List,ListItem} from 'material-ui';
 import listadoConceptos from './Conceptos/ListadoConceptos';
 import AgregarHorarioManual from './GestionPersonal/CargaManualPresentismo';
+import DepurarHorarios from './GestionPersonal/DepurarHorarios';
+import Planillones from './GestionPersonal/Planillones';
     
     
     class Nav extends React.Component{
@@ -51,6 +53,11 @@ import AgregarHorarioManual from './GestionPersonal/CargaManualPresentismo';
                 'funcion':listadoConceptos},
                 {'nombre':'Carga Manual de Presentismo',
                 'funcion':AgregarHorarioManual},
+                {'nombre':'Depuracion de Presentimos',
+                'funcion':DepurarHorarios},
+                {'nombre':'Planillones',
+                'funcion':Planillones},
+                
             ];
     
             return lista;

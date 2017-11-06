@@ -56,7 +56,7 @@ class Contenedor extends Component{
                     name='legajo'/>
                     <br/>
                     <TextField floatingLabelText={ <label htmlFor="">Nombre y Apellido</label> } value={this.state.nombre} name='nombre' 
-                    floatingLabelFixed={true} />
+                    floatingLabelFixed={true} disabled />
                     <br/>
                     Desde
                     <br/>

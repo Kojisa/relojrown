@@ -31,6 +31,14 @@ export default class DBHandler{
         }
     }
 
+    pedir_planillones(fun){
+        this.enviarPeticion(fun,'api/0.1/buildings','GET',null,true);
+    }
+
+    guardar_planillon(fun,id,descripcion){
+        this.enviarPeticion(fun,'/api/0.1/buildings','PUT',{building_id:id,description:descripcion})
+    }
+
     guardar_horario(datos,legajo){
         this.enviarPeticion((datos)=>(console.log(datos)),'api/0.1/schedule/'+legajo,'POST',datos,true);
     }

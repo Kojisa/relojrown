@@ -220,7 +220,7 @@ class Sexo extends Component{
                 <label>Sexo</label>
                 <RadioButtonGroup valueSelected={this.state.valor} 
                 labelPosition='left' style={{marginTop:'15px'}}
-                onChange={this.actualizarValor}>
+                onChange={this.actualizarValor} name='sexo' >
                     <RadioButton label='Masculino' value='M'/>
                     <RadioButton label='Femenino' value='F'/>
                     <RadioButton label='General' value='B' />

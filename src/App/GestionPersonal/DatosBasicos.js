@@ -63,7 +63,7 @@ class Contenedor extends Component{
             schedule:{},
             valid_to:'',
             valid_from:'',
-            building:2,
+            building:planillon,
             nuevo:true,
             modificado:true,
 
@@ -72,11 +72,14 @@ class Contenedor extends Component{
     }
 
     cargarHorarios(datos){
-
+        console.log(datos);
         for (let  x = 0; x < datos.schedules.length; x++){
-            datos.schedule[x]['nuevo'] = false;
-            datos.schedule[x]['modificado'] = false;
-        }
+            datos.schedules[x]['nuevo'] = false;
+            datos.schedules[x]['modificado'] = false;
+            datos.schedules[x].valid_to = datos.schedules[x].to_date;
+            datos.schedules[x].valid_from = datos.schedules[x].from_date;
+            
+        }  
         this.setState({horarios:datos.schedules,
         cambioHorarios:false});
     }
@@ -135,7 +138,6 @@ class Contenedor extends Component{
                         valid_from:horarios[x].valid_from,
                         valid_to:horarios[x].valid_to,
                     }
-                    console.log(dic);
                     this.db.guardar_horario(dic,this.state.legajo);
 
                 }
@@ -378,12 +380,11 @@ class Horarios extends Component{
 class HorarioSemanal extends Component{
     constructor(props){
         super(props);
-
         this.state={
             semana:props.semana,
             dependencia:props.dependencia,
-            desde:props.desde.split(',')[1],
-            hasta:props.hasta.split(',')[1],
+            desde:props.desde.split('T')[0],
+            hasta:props.hasta.split('T')[0],
             orden:props.orden,
             modificado:props.modificado,
             nuevo:props.nuevo
@@ -399,8 +400,8 @@ class HorarioSemanal extends Component{
         this.setState({
             semana:props.semana,
             dependencia:props.dependencia,
-            desde:props.desde,
-            hasta:props.hasta,
+            desde:props.desde.split('T')[0],
+            hasta:props.hasta.split('T')[0],
             orden:props.orden,
             modificado:props.modificado,
             nuevo:props.nuevo
@@ -498,7 +499,6 @@ class HorarioSemanal extends Component{
         let datos = this.state.semana;
         let dias = ['Lunes','Martes','Miercoles','Jueves','Viernes','Sabado','Domingo','Feriados']
         if(!datos) return;
-
         let lista = dias.map((elem,index)=>{
             let entrada = '';
             let salida = '';
@@ -587,12 +587,22 @@ class AgregarPlanillon extends Component{
                     nombre:this.state.codigos[valor]
                 })
             }
+            else{
+                this.setState({
+                    codigo:valor
+                })
+            }
         }
         else if(campo == 'nombre'){
             if(valor in this.state.planillones){
                 this.setState({
                     codigo:this.state.planillones[valor],
                     nombre:valor
+                })
+            }
+            else{
+                this.setState({
+                    nombre:valor,
                 })
             }
         }
