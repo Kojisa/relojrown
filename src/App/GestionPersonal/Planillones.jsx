@@ -34,7 +34,9 @@ class Contenedor extends Component{
         this.db = new DBHandler();
         this.cargarPlanillones = this.cargarPlanillones.bind(this);
         this.pedirPlanillones = this.pedirPlanillones.bind(this);
-        
+        this.actualizarDescripcion = this.actualizarDescripcion.bind(this);
+        this.actualizarPrincipal = this.actualizarPrincipal.bind(this);
+        this.mostrarPlanillones = this.mostrarPlanillones.bind(this);
 
     }
 
@@ -51,9 +53,22 @@ class Contenedor extends Component{
     }
 
     cargarPlanillones(datos){
-        console.log(datos);
         this.setState({
             planillones:datos.buildings
+        })
+    }
+
+    actualizarDescripcion(codigo,descripcion){
+        let planillones = this.state.planillones;
+
+        for (let x = 0; x < planillones.length; x++ ){
+            if(planillones[x][0] === codigo){
+                planillones[x][1] = descripcion;
+                break
+            }
+        }
+        this.setState({
+            planillones:planillones,
         })
     }
 
@@ -67,7 +82,7 @@ class Contenedor extends Component{
         let lista=[];
         for(let x = 0; x < planillones.length; x++){
             if(planillones[x][1].toLowerCase().includes( this.state.filtro.toLowerCase()) ){
-                lista.push( <ListItem onClick={()=>(this.actualizarFiltro(planillones[x][0]))}  >{planillones[x][1]}</ListItem> );
+                lista.push( <ListItem onClick={()=>(this.actualizarPrincipal(planillones[x][0]))}  >{planillones[x][1]}</ListItem> );
             }
         }
         return lista
