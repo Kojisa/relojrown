@@ -77,12 +77,11 @@ class Contenedor extends Component{
 
         return(
             <div>
-                <Paper style={{width:'400px'}} >
+                <Paper style={{minWidth:'400px',display:'inline-block'}} >
                     <div style={{margin:'5px'}}>
                         <TextField value={this.state.legajo}  onChange={this.actualizar} name='legajo'
                         floatingLabelText={ <label htmlFor="">Nº Legajo</label> } 
                         onBlur={this.obtenerNombre}></TextField>
-                        <br/>
                         <TextField value={this.state.nombre} name='nombre' disabled floatingLabelText={ <label htmlFor="">Nombre</label> } 
                         floatingLabelFixed={true} 
                        ></TextField>

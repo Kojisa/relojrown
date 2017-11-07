@@ -35,12 +35,12 @@ class Contenedor extends Component{
         this.cargarPlanillones = this.cargarPlanillones.bind(this);
         this.pedirPlanillones = this.pedirPlanillones.bind(this);
         this.actualizarDescripcion = this.actualizarDescripcion.bind(this);
-        this.actualizarPrincipal = this.actualizarPrincipal.bind(this);
-        this.mostrarPlanillones = this.mostrarPlanillones.bind(this);
+        this.actualizarElegido = this.actualizarElegido.bind(this);
+        this.actualizarNuevo = this.actualizarNuevo.bind(this);
 
     }
 
-    actualizarPrincipal(codigo){
+    actualizarElegido(codigo){
         this.setState({
             elegido:codigo,
         })
@@ -76,13 +76,18 @@ class Contenedor extends Component{
         this.db.pedir_planillones(this.cargarPlanillones)
     }
 
+    actualizarNuevo(){
+        console.log('entra')
+        this.actualizarElegido('NUEVO');
+    }
+
     mostrarPlanillones(){
 
         let planillones = this.state.planillones;
         let lista=[];
         for(let x = 0; x < planillones.length; x++){
             if(planillones[x][1].toLowerCase().includes( this.state.filtro.toLowerCase()) ){
-                lista.push( <ListItem onClick={()=>(this.actualizarPrincipal(planillones[x][0]))}  >{planillones[x][1]}</ListItem> );
+                lista.push( <ListItem onClick={()=>(this.actualizarElegido(planillones[x][0]))}  >{planillones[x][1]}</ListItem> );
             }
         }
         return lista
@@ -91,29 +96,44 @@ class Contenedor extends Component{
 
     render(){
         let edicion= null;
-        if(this.state.elegido){
-            edicion= <EdicionPlanillon codigo={this.state.elegido} 
-            descripcion={this.state.planillones[this.state.elegido]}/>
+        if(this.state.elegido != ''){
+            let descripcion = ''
+            if(this.state.elegido === 'NUEVO'){
+                descripcion = '';
+            }
+            else{
+                descripcion = this.state.planillones[this.state.elegido]
+            }
+            edicion= (
+            <Paper style={{display:'inline-block',verticalAlign:'top',float:'left',marginLeft:'10px'}}>
+                <div style={{margin:'5px'}} >
+                    <EdicionPlanillon codigo={this.state.elegido} 
+                    descripcion={descripcion}/>
+                </div>
+            </Paper>)
+            
+        }
+
+        let lista = null;
+        if(this.state.planillones.length > 0 ){
+            lista = (
+                <List>
+                    {this.mostrarPlanillones()}
+                </List>
+            )
         }
 
         return(
             <div>
-                <Paper style={{width:'400px',height:'90%'}}>
+               <Paper style={{width:'400px',height:'90%',float:'left'}}>
                     <div style={{margin:'5px'}} >
                         <TextField name='filtro' value={this.state.filtro} onChange={this.actualizarFiltro} ></TextField>
-                        <RaisedButton label='Agregar' onClick={this.actualizarPrincipal('NUEVO')} ></RaisedButton>
+                        <RaisedButton label='Agregar' onClick={this.actualizarNuevo} ></RaisedButton>
                         <br/>
-                        <List>
-                            {this.mostrarPlanillones()}
-                        </List>
+                        {lista}
                     </div>
                 </Paper>
-                <Paper style={{display:'inline-block',verticalAlign:'top'}}>
-                    <div style={{margin:'5px'}} >
-
-                    {edicion}
-                    </div>
-                </Paper>
+                {edicion}
             </div>
         )
     }
@@ -148,6 +168,7 @@ class EdicionPlanillon extends Component{
     }
 
     componentWillReceiveProps(props){
+        
         if(props.codigo === 'NUEVO'){
             this.setState({
                 codigo:'',
@@ -166,12 +187,13 @@ class EdicionPlanillon extends Component{
         return(
             <div>
                 <TextField floatingLabelText={ <label htmlFor="">Codigo</label> } 
-                value={this.state.codigo} disabled floatingLabelFixed={true} ></TextField>
+                value={this.state.codigo} floatingLabelFixed={true} disabled></TextField>
                 <br/>
-                <TextField floatingLabelText={ <label htmlFor="">Descripción</label> } 
-                value={this.state.descripcion} onChange={this.actualizar} > </TextField>
+                <TextField floatingLabelText={ <label htmlFor="">Descripcion</label> } 
+                value={this.state.descripcion} name='descripcion' onChange={this.actualizar}></TextField>
                 <br/>
-                <RaisedButton primary={true} onClick={this.guardar} ></RaisedButton>
+                <RaisedButton label ='Guardar'
+                primary={true} onClick={this.guardar} ></RaisedButton>
             </div>
         )
     }
