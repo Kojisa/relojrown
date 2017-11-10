@@ -64,7 +64,7 @@ class Contenedor extends Component{
     }
 
     pedirRegistros(){
-
+        this.db.enviarPeticion((datos)=>(console.log(datos)),'api/0.1/attendance/'+this.state.legajo,'POST',{from_date:this.state.desde,to_date:this.state.hasta},true);
     }
 
 

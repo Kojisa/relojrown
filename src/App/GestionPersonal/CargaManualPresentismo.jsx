@@ -34,12 +34,25 @@ class Contenedor extends Component{
         }
         this.actualizar = this.actualizar.bind(this);
         this.enviarHorario = this.enviarHorario.bind(this);
+        this.cargarNombre = this.cargarNombre.bind(this);
+        this.pedirNombre = this.pedirNombre.bind(this);
+        this.db = new DBHandler();
     }
     
     actualizar(evento){
         this.setState({
                 [evento.target.name]:evento.target.value
             })
+    }
+
+    cargarNombre(datos){
+        this.setState({
+            nombre:datos.name,
+        })
+    }
+
+    pedirNombre(){
+        this.db.pedir_nombre(this.cargarNombre,this.state.legajo)
     }
 
     enviarHorario(){
@@ -53,7 +66,7 @@ class Contenedor extends Component{
             <Paper style={{width:'350px'}} >
                 <div style={{margin:'5px'}}>
                     <TextField floatingLabelText={ <label htmlFor="">Nº Legajo</label> } value={this.state.legajo} onChange={this.actualizar}
-                    name='legajo'/>
+                    name='legajo' onBlur={this.pedirNombre} />
                     <br/>
                     <TextField floatingLabelText={ <label htmlFor="">Nombre y Apellido</label> } value={this.state.nombre} name='nombre' 
                     floatingLabelFixed={true} disabled />

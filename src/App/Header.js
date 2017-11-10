@@ -16,6 +16,9 @@ import listadoConceptos from './Conceptos/ListadoConceptos';
 import AgregarHorarioManual from './GestionPersonal/CargaManualPresentismo';
 import DepurarHorarios from './GestionPersonal/DepurarHorarios';
 import Planillones from './GestionPersonal/Planillones';
+import VerPresentes from './Inasistencias/VerPresentes';
+import AsistenciaPorLegajo from './Inasistencias/AsistenciaPorLegajo';
+import HorasExtras from './Dependencias/HorasExtras';
     
     
     class Nav extends React.Component{
@@ -57,6 +60,14 @@ import Planillones from './GestionPersonal/Planillones';
                 'funcion':DepurarHorarios},
                 {'nombre':'Planillones',
                 'funcion':Planillones},
+                {'nombre':'Presentes',
+                'funcion':VerPresentes},
+                {'nombre':'Presentismo Por Legajo',
+                'funcion':AsistenciaPorLegajo},
+                {'nombre':'Horas Extras',
+                'funcion':HorasExtras},
+                
+
                 
             ];
     
@@ -93,7 +104,7 @@ import Planillones from './GestionPersonal/Planillones';
             return (
                 <MUICont>
                     <div>
-                        <AppBar title={this.state.titulo} onLeftIconButtonTouchTap={this.cambiarEstado} />
+                        <AppBar title={this.state.titulo} onLeftIconButtonTouchTap={this.cambiarEstado} style={{width:'100%',position:'fixed',top:'0px'}} />
                         <Drawer docked={false} width={300} open={this.state.abierto} onRequestChange={this.cambiarEstado} >
                             <List>
                                 {this.generarListado()}
@@ -165,8 +176,8 @@ import Planillones from './GestionPersonal/Planillones';
         constructor(props){
             super(props);
             this.state = {
-                render:true,
-                loged:true,
+                render:false,
+                loged:false,
                 estadoNav:false,
             }
             this.logueado = this.logueado.bind(this);
@@ -198,13 +209,11 @@ import Planillones from './GestionPersonal/Planillones';
             }
     
             return (
-                <div style={{display:"flex",flexDirection:"row",padding:'0',margin:'0',
-                    boxSizing:'border-box',height:'100%',width:'100%'}}>
+                <div >
+                    <Nav  render={this.state.render} ref={(elem)=>{this.nav = elem}} abierto={this.state.estadoNav}/>
+                    <div ref={(elem)=>{this.mainCont=elem;if(elem)elem.limpiar=limpiarCont}} id="main" 
+                    style={{display:"inline-block",overflowY:"auto",height:"100%",width:"90%",marginTop:'60px'}} >
                     
-                    <div style={{display:"block",flexDirection:"column",flexGrow:"1",height:"100%",boxSizing:"border-box"}}>
-                        <Nav  render={this.state.render} ref={(elem)=>{this.nav = elem}} abierto={this.state.estadoNav}/>
-                        <div ref={(elem)=>{this.mainCont=elem;if(elem)elem.limpiar=limpiarCont}} id="main" style={{display:"inline",overflowY:"auto",height:"100%",width:"90%"}} >
-                    </div>
                     </div>
                 </div>)
         }

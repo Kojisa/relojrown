@@ -37,6 +37,7 @@ class Contenedor extends Component{
         this.actualizarDescripcion = this.actualizarDescripcion.bind(this);
         this.actualizarElegido = this.actualizarElegido.bind(this);
         this.actualizarNuevo = this.actualizarNuevo.bind(this);
+        this.pedirPlanillones();
 
     }
 
@@ -53,6 +54,7 @@ class Contenedor extends Component{
     }
 
     cargarPlanillones(datos){
+        console.log(datos);
         this.setState({
             planillones:datos.buildings
         })

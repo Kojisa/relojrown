@@ -5,7 +5,7 @@ export default class DBHandler{
 
     RUTABASICA = 'api/0.1/'
 
-    actualizar_limite(fun,datos){
+    actualizar_limite(fun,datos,tipo){
 
         let fecha = new Date();
         let anio = fecha.getFullYear();
@@ -21,14 +21,46 @@ export default class DBHandler{
             'year': anio,
             'month':mes,
         }
+        let extra;
+        if(tipo === 'dependencias'){
+            extra = 'dependencies';
+        }
+        else{
+            extra ='secretariet'
+        }
+        
         if(datos.repeticion == 12){
-            this.enviarPeticion(fun,'api/0.1/budget','POST',armarDatos,true);
+            this.enviarPeticion(fun,'api/0.1/budget/'+extra,'POST',armarDatos,true);
         }
         
         else{
             datos['repeticion'] += 1;
-            this.enviarPeticion(()=>{this.actualizar_limite(fun,datos)},'api/0.1/budget','POST',armarDatos,true);
+            this.enviarPeticion(()=>{this.actualizar_limite(fun,datos,tipo)},'api/0.1/budget/'+extra,'POST',armarDatos,true);
         }
+    }
+
+    pedir_limite_secretarias(fun){
+        let fecha = new Date();
+        let mes = fecha.getMonth() + 1;
+        let anio = fecha.getFullYear();
+        this.enviarPeticion(fun,'api/0.1/budget/secretariat/'+anio+'/'+mes,'GET',null,true);
+    }
+
+    pedir_horas_extras(fun,datos){
+        this.enviarPeticion(fun,'api/0.1/overtime/jurisdiction','POST',{
+            initial_date:datos.desde,
+            end_date:datos.hasta},true);
+        /*this.enviarPeticion(fun,'api/0.1/overtime/dependencies','POST',{
+            initial_date:datos.desde,
+            end_date:datos.hasta},true);*/
+    }
+
+    pedir_historial_presentismo(fun,datos){
+        this.enviarPeticion(fun,'api/0.1/attendance/'+datos.legajo,'POST',{from_date:datos.from_date,to_date:datos.to_date},true);
+    }
+
+    pedir_asistentes(fun){
+        this.enviarPeticion(fun,'api/0.1/attendance/working','GET',null,true);
     }
 
     pedir_planillones(fun){
@@ -73,7 +105,7 @@ export default class DBHandler{
         let fecha = new Date();
         let mes = fecha.getMonth() + 1;
         let anio = fecha.getFullYear();
-        this.enviarPeticion(fun,'api/0.1/budget/'+anio+'/'+mes,'GET',null,true);
+        this.enviarPeticion(fun,'api/0.1/budget/dependencies/'+anio+'/'+mes,'GET',null,true);
     }
 
     pedir_dependencias(fun){

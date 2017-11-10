@@ -72,7 +72,6 @@ class Contenedor extends Component{
     }
 
     cargarHorarios(datos){
-        console.log(datos);
         for (let  x = 0; x < datos.schedules.length; x++){
             datos.schedules[x]['nuevo'] = false;
             datos.schedules[x]['modificado'] = false;
@@ -98,7 +97,6 @@ class Contenedor extends Component{
                 premio:null,
                 dependencia:'',
                 horarios:[],
-                planillones:[],
                 cambioAnios:false,
                 cambioTipoAsist:false,
                 cambioPremio:false,
@@ -329,9 +327,14 @@ class Horarios extends Component{
     
     constructor(props){
         super(props);
+
+        let planillones = props.planillones;
+        if(planillones){
+            planillones = planillones.sort((a,b)=>(a[0]-b[0]));
+        }
         this.state={
             horarios:props.horarios, //formato clave = dependencia, lista de horarios
-            planillones:props.planillones,
+            planillones:planillones,
             
         }
         this.actualizarHorario = props.funAct;
@@ -346,7 +349,7 @@ class Horarios extends Component{
     cargarPlanillones(){
         let lista = [];
         for (let x = 0; x < this.state.horarios.length; x++){
-            let tab = (<Tab label={this.state.horarios[x].building} key={x} value={this.state.horarios[x].building}> 
+            let tab = (<Tab label={this.state.planillones[parseInt(this.state.horarios[x].building) -1 ][1]} key={x} value={this.state.horarios[x].building}> 
                 <HorarioSemanal funAct={this.actualizarHorario} semana={this.state.horarios[x].schedule} desde={this.state.horarios[x].valid_from}
                 hasta={this.state.horarios[x].valid_to} orden={x} dependencia={this.state.horarios[x].building}
                 nuevo={this.state.horarios[x].nuevo} modificado={this.state.horarios[x].modificado} />
@@ -361,7 +364,12 @@ class Horarios extends Component{
     }
 
     componentWillReceiveProps(props){
-        this.setState({horarios:props.horarios});
+        
+        let planillones = props.planillones;
+        if(planillones){
+            planillones = planillones.sort((a,b)=>(a[0]-b[0]));
+        }
+        this.setState({horarios:props.horarios,planillones:props.planillones});
     }
 
     render(){
@@ -422,9 +430,8 @@ class HorarioSemanal extends Component{
     }
 
     pasarHoraNumero(string){
-        let hora = parseInt(string[0]+string[1]);
+        let hora = parseInt(string[0]+string[1]) * 60;
         let minutos = parseInt(string[3]+string[4]);
-        minutos = (minutos/60)
         let final = hora + minutos;
         final = final.toFixed(2);
         return final;
@@ -471,7 +478,10 @@ class HorarioSemanal extends Component{
     transformarHora(numero){
         if(!numero){return ''}
         let horaFinal = '';
-        let hora = numero.toString().split('.');
+        if(numero >= 1440){
+            numero = numero - 1440;
+        }
+        let hora = (numero/60).toString().split('.');
         
         if(hora[0].length == 1){
             horaFinal ='0' + hora[0];
@@ -493,11 +503,12 @@ class HorarioSemanal extends Component{
         return horaFinal;
 
 
+
     }
 
     generarSemana(){
         let datos = this.state.semana;
-        let dias = ['Lunes','Martes','Miercoles','Jueves','Viernes','Sabado','Domingo','Feriados']
+        let dias = ['Lunes','Martes','Miercoles','Jueves','Viernes','Sabado','Domingo','Feriado']
         if(!datos) return;
         let lista = dias.map((elem,index)=>{
             let entrada = '';

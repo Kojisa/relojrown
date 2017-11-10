@@ -1,7 +1,7 @@
 import React,{Component} from 'react';
 import ReactDOM from 'react-dom';
 import MUICont from 'material-ui/styles/MuiThemeProvider';
-import {TextField,Paper,RaisedButton,List,ListItem} from 'material-ui';
+import {TextField,Paper,RaisedButton,List,ListItem,Tab,Tabs} from 'material-ui';
 import dbHandler from '../DBHandler.js';
 
 
@@ -29,14 +29,20 @@ class Contenedor extends Component{
     constructor(props){
         super(props);
         this.state={
+            secretarias:[],
             dependencias:[],
             filtro:'',
         }
+        this.pedirSecretarias = this.pedirSecretarias.bind(this);
         this.pedirDependencias = this.pedirDependencias.bind(this);
         this.cargarDependencias = this.cargarDependencias.bind(this);
         this.actualizarDependencia = this.actualizarDependencia.bind(this);
-        this.actualizar = this.actualizar.bind(this);
+        this.actualizar = this.actualizar.bind(this); 
+        this.cargarSecretarias = this.cargarSecretarias.bind(this);
+
+        this.db = new dbHandler();
         this.pedirDependencias();
+        this.pedirSecretarias();
     }
 
     actualizar(valor,campo){
@@ -48,6 +54,17 @@ class Contenedor extends Component{
         
     }
 
+    cargarSecretarias(datos){
+        let lista = datos.budgets;
+        lista.map((elem)=>{elem.push(0);elem.push(false)});
+        lista.sort((a,b)=>{return a[1].localeCompare(b[1])})
+        this.setState({secretarias:lista});
+    }
+
+    pedirSecretarias(){
+        this.db.pedir_limite_secretarias(this.cargarSecretarias)
+    }
+
     cargarDependencias(datos){
         let lista = datos.budgets;
         lista.map((elem)=>{elem.push(0);elem.push(false)});
@@ -56,8 +73,7 @@ class Contenedor extends Component{
     }
 
     pedirDependencias(){
-        let db = new dbHandler();
-        db.pedir_dependencias_limite(this.cargarDependencias);
+        this.db.pedir_dependencias_limite(this.cargarDependencias);
 
     }
 
@@ -68,7 +84,15 @@ class Contenedor extends Component{
             <div>
                 
                 <BarraFiltrado funAct={this.actualizar}/>
-                <Listado lista={this.state.dependencias} funAct={this.actualizar} filtrado={this.state.filtro}/>
+                <Tabs>
+                    <Tab label='Secretarias'>
+                        <Listado tipo='secretarias' lista={this.state.secretarias} funAct={this.actualizar} filtrado={this.state.filtro}></Listado>
+                    </Tab>
+                    <Tab label='Dependencias' >
+                        <Listado tipo='dependencias' lista={this.state.dependencias} funAct={this.actualizar} filtrado={this.state.filtro}/>
+                    </Tab>
+                </Tabs>
+                
             </div>
         )
 
@@ -84,6 +108,7 @@ class Listado extends Component {
     this.state={
       lista:props.lista,
       filtrado:props.filtrado,
+      tipo:props.tipo
     }
     this.cargarListado = this.cargarListado.bind(this);
     this.actualizarPadre = props.funAct;
@@ -92,11 +117,7 @@ class Listado extends Component {
 
   componentWillReceiveProps(props){
 
-    this.setState({lista:props.lista,filtrado:props.filtrado});
-  }
-
-  actualizarDependencia(monto,codigo){
-
+    this.setState({lista:props.lista,filtrado:props.filtrado,tipo:props.tipo});
   }
 
 
@@ -110,7 +131,8 @@ class Listado extends Component {
         if(listado[x][1].toLowerCase().includes(this.state.filtrado.toLowerCase())){
             final.push(
                 <Linea nombre={listado[x][1]} codigo={listado[x][0]} monto={listado[x][2]} nuevoLimite={listado[x][3]} 
-                funAct={this.actualizarDependencia} actualizando={listado[x][4]} key={x}/>
+                funAct={this.actualizarDependencia} actualizando={listado[x][4]} 
+                tipo={this.state.tipo} key={x}/>
             )
             if(final.length === maximo){
                 break;
@@ -142,7 +164,8 @@ class Linea extends Component{
             codigo:props.codigo,
             monto:props.monto,
             nuevo:props.nuevoLimite,
-            actualizando:props.actualizando
+            actualizando:props.actualizando,
+            tipo:props.tipo
         }
         this.actualizarMonto = this.actualizarMonto.bind(this);
         this.actualizarLimite = this.actualizarLimite.bind(this);
@@ -160,7 +183,7 @@ class Linea extends Component{
         let datos = this.state;
         datos['repeticion'] = 0;
         this.setState({actualizando:true});
-        db.actualizar_limite(()=>(this.setState({actualizando:false})),datos);
+        db.actualizar_limite(()=>(this.setState({actualizando:false})),datos,this.state.tipo);
         
     }
 
