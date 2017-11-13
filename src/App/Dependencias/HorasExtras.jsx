@@ -25,15 +25,13 @@ class Contenedor extends Component{
         super(props);
         this.state={
             secretarias:[
-                ['codigo1','nombre1','budget1','consumo1'],
-                ['codigo2','nombre2','budget2','consumo2'],
-                ['codigo3','nombre3','budget3','consumo3'],
                 
             ],
+            consumos:{
+
+            },
             ref:{
-                'codigo1':0,
-                'codigo2':1,
-                'codigo3':2,
+                
             },
             elegido:'',//jurisdiccion elegida para ver detalles.
             desde:'',
@@ -47,6 +45,7 @@ class Contenedor extends Component{
         this.cargarHorasExtras = this.cargarHorasExtras.bind(this);
         this.pedirHorasExtras = this.pedirHorasExtras.bind(this);
         this.actualizarElegido = this.actualizarElegido.bind(this);
+
     }
 
     actualizar(evento){
@@ -56,43 +55,54 @@ class Contenedor extends Component{
     }
 
     actualizarElegido(codigo){
-        console.log(codigo);
         this.setState({
             elegido:codigo,
         })
     }
 
     cargarHorasExtras(datos){
-        console.log(datos);
-        let secret = this.state.secretarias;
-        for(let x = 0; x < datos.overtimes.lenght; x++){
-
+        let secret = this.state.consumos;
+        for(let x = 0; x < datos.overtimes.length; x++){
            
-            if(datos.overtimes[x][0] in this.state.ref){
-                secret[this.state.ref[ datos.overtimes[x][0] ] ] [3] = datos.overtimes[x][2];
+            if(datos.overtimes[x].secretariat_id in secret){
+                if(datos.overtimes[x].hour_type === '50%'){
+                    secret[datos.overtimes[x].secretariat_id ][0] = datos.overtimes[x].result.toFixed(2);
+                }
+                
+                else if(datos.overtimes[x].hour_type === '100%'){
+                    secret[datos.overtimes[x].secretariat_id][1] = datos.overtimes[x].result.toFixed(2);
+                }
+
+                else if(datos.overtimes[x].hour_type === '50%N'){
+                    secret[datos.overtimes[x].secretariat_id ] [2] = datos.overtimes[x].result.toFixed(2);
+                }
+                else if(datos.overtimes[x].hour_type === '100%N'){
+                    secret[datos.overtimes[x].secretariat_id ] [3] = datos.overtimes[x].result.toFixed(2);
+                }
                    
             }
         }
         this.setState({
-            secretarias:secret,
+            consumos:secret,
         })
 
 
     }
 
     pedirHorasExtras(datos){
-        
-        let refs = {};
+        let consumos = {};
+        let ref = {};
         let secretarias = datos.budgets;
-        for (let x = 0 ; x < datos.budgets.lenght; x++){
-            refs[datos.budgets[x][0]] = x;
-            secretarias.push(0);
-        }
-        
-
+        secretarias.map((elem,index)=>{
+            consumos[elem[0]] = [0,0,0,0]
+            ref[elem[0]] = index;
+            elem.push(0);
+        })
+    
         this.setState({
+            ref:ref,
             secretarias:datos.budgets,
-            ref:refs, //guardo las referencais 
+            consumos:consumos
         })
         this.db.pedir_horas_extras(this.cargarHorasExtras,{desde:this.state.desde,hasta:this.state.hasta})
     }
@@ -108,7 +118,8 @@ class Contenedor extends Component{
             console.log(this.state.elegido);
             let secre = this.state.secretarias[this.state.ref[this.state.elegido]];
             panel = <PanelInfo secretaria={secre[1]} codigo={secre[0]} 
-            limite={secre[2]} gastos={secre[3]} ></PanelInfo>
+            limite={secre[2]} gastos={this.state.consumos[secre[0]]} desde={this.state.desde}
+            hasta={this.state.hasta} ></PanelInfo>
         }
 
         return(
@@ -121,7 +132,7 @@ class Contenedor extends Component{
                     <br/>
                     <RaisedButton label='Pedir Datos' onClick={this.pedirJurisdicciones} ></RaisedButton>
                 </div>
-                <Tarjetas secretarias={this.state.secretarias} funAct={this.actualizarElegido}></Tarjetas>
+                <Tarjetas secretarias={this.state.secretarias} consumos={this.state.consumos} funAct={this.actualizarElegido}></Tarjetas>
                 {panel}
             </Paper>
         )
@@ -139,24 +150,126 @@ class PanelInfo extends Component{
             dependencias:[],
             limite:props.limite,
             gastos:props.gastos,
+            desde:props.desde,
+            hasta:props.hasta,
+            ref:{}
         }
 
         this.db = new DBHandler();
-        this
+        this.pedirDependenciasAsociadas = this.pedirDependenciasAsociadas.bind(this);
+        this.cargarDependencias = this.cargarDependencias.bind(this);
+        this.pedirLimitesDependencias = this.pedirLimitesDependencias.bind(this);
+        this.cargarLimitesDependencias = this.cargarLimitesDependencias.bind(this);
+        this.cargarGastosDependencias = this.cargarGastosDependencias.bind(this);
+        this.pedirGastosDependencias = this.pedirGastosDependencias.bind(this);
+        this.pedirDependenciasAsociadas();
+        
     }
 
-    cargarDependencias(datos){
+    cargarGastosDependencias(datos){
+        console.log(datos)
+        let depen = this.state.dependencias;
+        let ref = this.state.ref;
+        for (let x = 0; x < datos.overtimes.length; x++){
+            if(datos.overtimes[x]['dependence_id'] in ref){
+                let ind = ref[datos.overtimes[x]['dependence_id']];
+                depen[ind][depen[ind].length - 1] = datos.overtimes[x]['result'].toFixed(2);
+            }
+        }
+        console.log(depen);
         this.setState({
-            dependencias:datos.budget,
+            dependencias:depen,
         })
     }
 
-    pedirDependenciasAsociadas(){
-        this.db.pedir_dependnecias_horas_extras()
+    pedirGastosDependencias(){
+
+        this.db.pedir_gastos_dependencias(this.cargarGastosDependencias,this.state.desde,this.state.hasta);
     }
 
 
+    cargarLimitesDependencias(datos){;
+        let depen = this.state.dependencias;
+        let ref = this.state.ref;
+        for (let x = 0; x < datos.budgets.length; x++){
+            if(datos.budgets[x][0] in ref){
+                let ind = ref[datos.budgets[x][0]];
+                depen[ind][depen[ind].length - 2] = datos.budgets[x][datos.budgets[x].length - 1];
+            }
+        }
+        console.log(depen);
+        this.setState({
+            dependencias:depen,
+        },this.pedirGastosDependencias());
+    }
+
+    pedirLimitesDependencias(){
+        this.db.pedir_dependencias_limite(this.cargarLimitesDependencias);
+    }
+
+    cargarDependencias(datos){
+        console.log(datos);
+        let dependencias = [];
+        let ref={};
+        datos.dependencies.map((elem,index)=>{
+            elem.push(0);
+            elem.push(0);
+            dependencias.push(elem);
+            ref[elem[0]]= index;
+        });
+        datos['sub-dependencies'].map((elem,index)=>{
+            elem.push(0);
+            elem.push(0);
+            dependencias.push(elem);
+            ref[elem[0]]= index;
+        });
+
+        console.log(dependencias)
+        this.setState({
+            dependencias:dependencias,
+            ref:ref,
+        },()=>(this.pedirLimitesDependencias()));
+
+        
+    }
+
+    pedirDependenciasAsociadas(){
+        this.db.pedir_dependencias_jurisdiccion(this.cargarDependencias,this.state.codigo)
+    }
+
+    componentWillReceiveProps(props){
+        let depen = this.state.dependencias;
+        if (props.codigo !== this.state.codigo){
+            depen = [];
+        }
+
+        this.setState({
+            codigo:props.codigo,
+            secretaria:props.secretaria,
+            limite:props.limite,
+            gastos:props.gastos,
+            dependencias:depen,
+            desde:props.desde,
+            hasta:props.hasta,
+        },()=>(this.pedirDependenciasAsociadas()))
+        
+
+    }
+
+    listarDependencias(){
+        if(this.state.dependencias.length === 0 ){
+            return null;
+        }
+
+        return this.state.dependencias.map((elem,index)=>(
+            <TarjetaDepen limite={elem[elem.length - 2]} gastado={elem[elem.length - 1]} descripcion={elem[1]} ></TarjetaDepen>
+        ))
+    }
+
     render(){
+
+        let gastoTotal = 0;
+        this.state.gastos.map((elem)=>(gastoTotal += parseFloat(elem)));
 
         return(
             <Paper style={{float:'left',display:'inline-block',width:'400px',margin:'5px',height:'600px'}} >
@@ -167,12 +280,14 @@ class PanelInfo extends Component{
                     <br/>
                     <Tabs>
                         <Tab label='Secretaria' >
-                            <label >Gastos del mes Actual : </label>
-                            <label htmlFor=""> {this.state.gastos}</label>
+                            <label >Gastos del periodo Seleccionado : </label>
+                            <label htmlFor=""> {gastoTotal}</label>
 
                         </Tab>
-                        <Tab label='Dependencias' >
-
+                        <Tab label='Dependencias'>
+                            <div style={{width:'100%',height:'490px',overflowY:'auto',flexDirection:'column'}} >
+                            {this.listarDependencias()}
+                            </div>
                         </Tab>
                     </Tabs>
                 </div>
@@ -191,6 +306,7 @@ class Tarjetas extends Component{
         super(props);
         this.state={
             secretarias:props.secretarias,
+            consumos:props.consumos
         }
 
         this.actualizarActual = props.funAct;
@@ -201,6 +317,7 @@ class Tarjetas extends Component{
     componentWillReceiveProps(props){
         this.setState({
             secretarias:props.secretarias,
+            consumos:props.consumos,
         })
     }
 
@@ -211,10 +328,14 @@ class Tarjetas extends Component{
             return []
         }
 
-        return lista.map((elem,index)=>(
-            <Tarjeta codigo={elem[0]} nombre={elem[1]} limite={elem[2]} 
-            gastado={elem[3]} funAct={this.actualizarActual} ></Tarjeta>
-        ))
+        return lista.map((elem,index)=>{
+            let gastos = 0
+            if(elem[0] in this.state.consumos){
+                gastos = this.state.consumos[elem[0]].reduce((a,b)=>(parseFloat(a) + parseFloat(b)),0);
+            }
+            return <Tarjeta codigo={elem[0]} nombre={elem[1]} limite={elem[2]} 
+            gastado={gastos} funAct={this.actualizarActual} ></Tarjeta>
+        })
     }
 
 
@@ -261,7 +382,7 @@ class Tarjeta extends Component{
     render(){
 
         return( 
-            <Paper style={{display:'inline-block',width:'300',margin:'10px',height:'60px'}} onClick={this.marcarActual} >
+            <Paper style={{display:'inline-block',width:'300px',margin:'10px',height:'90px'}} onClick={this.marcarActual} >
                 <div style={{margin:'5px'}}>
                     <label htmlFor="">{this.state.nombre}</label>
                     <br/>
@@ -270,6 +391,45 @@ class Tarjeta extends Component{
                     <label htmlFor="" style={{marginLeft:'5px'}} > De </label>
                     <label htmlFor="">${this.state.limite}</label>
                 </div>
+            </Paper>
+        )
+    }
+}
+
+
+class TarjetaDepen extends Component{
+
+    constructor(props){
+        super(props);
+
+        this.state ={
+            descripcion:props.descripcion,
+            limite:props.limite,
+            gastado:props.gastado
+        }
+    }
+
+    componentWillReceiveProps(props){
+        this.setState({
+            descripcion:props.descripcion,
+            limite:props.limite,
+            gastado:props.gastado
+        })
+    }
+
+    render(){
+
+        return(
+            <Paper style={{width:'360px',height:'70px',display:'block'}} >
+                <div style={{margin:'5px'}} >
+                    <label htmlFor="">{this.state.descripcion}</label>
+                    <br/>
+                    <label style={{width:'70px', display:'inline-block'}} >Gastado: </label>
+                    <label htmlFor="">${this.state.gastado}</label>
+                    <label style={{width:'30px',display:'inline-block',marginLeft:'5px'}}> de </label>
+                    <label htmlFor="">${this.state.limite}</label>         
+                </div>
+                <br/>
             </Paper>
         )
     }

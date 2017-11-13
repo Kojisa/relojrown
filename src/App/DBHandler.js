@@ -1,7 +1,7 @@
 export default class DBHandler{
     
     PORT = ":8000";// ":8000";
-    HOST = 'localhost'//"172.20.0.3";
+    HOST = "172.20.0.3";
 
     RUTABASICA = 'api/0.1/'
 
@@ -37,6 +37,10 @@ export default class DBHandler{
             datos['repeticion'] += 1;
             this.enviarPeticion(()=>{this.actualizar_limite(fun,datos,tipo)},'api/0.1/budget/'+extra,'POST',armarDatos,true);
         }
+    }
+
+    pedir_dependencias_jurisdiccion(fun,juri){
+        this.enviarPeticion(fun,'api/0.1/dependencies/'+juri,'GET',null,false)
     }
 
     pedir_limite_secretarias(fun){
@@ -97,6 +101,10 @@ export default class DBHandler{
 
     pedir_nombre(fun,legajo){
         this.enviarPeticion(fun,'api/0.1/employee/'+legajo+'/name','GET',null,true);
+    }
+
+    pedir_gastos_dependencias(fun,desde,hasta){
+        this.enviarPeticion(fun,'api/0.1/overtime/dependencies','POST',{initial_date:desde,end_date:hasta},true);
     }
 
     pedir_dependencias_limite(fun){
