@@ -1,6 +1,7 @@
 import React,{Component} from 'react';
 import ReactDOM from 'react-dom';
-import {TextField,Paper,RaisedButton,List,ListItem,Divider,Tab,Tabs} from 'material-ui';
+import {TextField,Paper,RaisedButton,List,ListItem,
+    Divider,Tab,Tabs,MenuItem,SelectField} from 'material-ui';
 import MUICont from 'material-ui/styles/MuiThemeProvider';
 import DBHandler from '../DBHandler.js';
 
@@ -36,6 +37,23 @@ class Contenedor extends Component{
             elegido:'',//jurisdiccion elegida para ver detalles.
             desde:'',
             hasta:'',
+            mes:'',
+            anio:'',
+            meses:[
+                <MenuItem value={'01'} primaryText='Enero' />,
+                <MenuItem value={'02'} primaryText='Febrero'/>,
+                <MenuItem value={'03'} primaryText='Marzo'/>,
+                <MenuItem value={'04'} primaryText='Abril'/>,
+                <MenuItem value={'05'} primaryText='Mayo'/>,
+                <MenuItem value={'06'} primaryText='Junio'/>,
+                <MenuItem value={'07'} primaryText='Julio'/>,
+                <MenuItem value={'08'} primaryText='Agosto'/>,
+                <MenuItem value={'09'} primaryText='Septiembre'/>,
+                <MenuItem value={'10'} primaryText='Octubre'/>,
+                <MenuItem value={'11'} primaryText='Noviembre'/>,
+                <MenuItem value={'12'} primaryText='Diciembre'/>,
+            ],
+            
 
         }
 
@@ -61,29 +79,46 @@ class Contenedor extends Component{
     }
 
     cargarHorasExtras(datos){
-        let secret = this.state.consumos;
+        let consu = this.state.consumos;
+        let ref = this.state.ref;
+        let secret = this.state.secretarias;
         for(let x = 0; x < datos.overtimes.length; x++){
-           
-            if(datos.overtimes[x].secretariat_id in secret){
+            if(datos.overtimes[x].secretariat_id in consu){
                 if(datos.overtimes[x].hour_type === '50%'){
-                    secret[datos.overtimes[x].secretariat_id ][0] = datos.overtimes[x].result.toFixed(2);
+                    consu[datos.overtimes[x].secretariat_id ][0] = parseFloat(datos.overtimes[x].result.toFixed(2))
+                    secret[ref[datos.overtimes[x].secretariat_id]][3] += parseFloat(datos.overtimes[x].result.toFixed(2));
                 }
                 
                 else if(datos.overtimes[x].hour_type === '100%'){
-                    secret[datos.overtimes[x].secretariat_id][1] = datos.overtimes[x].result.toFixed(2);
+                    consu[datos.overtimes[x].secretariat_id][1] = parseFloat(datos.overtimes[x].result.toFixed(2))
+                    secret[ref[datos.overtimes[x].secretariat_id]][3] += parseFloat(datos.overtimes[x].result.toFixed(2));
                 }
 
                 else if(datos.overtimes[x].hour_type === '50%N'){
-                    secret[datos.overtimes[x].secretariat_id ] [2] = datos.overtimes[x].result.toFixed(2);
+                    consu[datos.overtimes[x].secretariat_id ] [2] = parseFloat(datos.overtimes[x].result.toFixed(2))
+                    secret[ref[datos.overtimes[x].secretariat_id]][3] += parseFloat(datos.overtimes[x].result.toFixed(2));
                 }
                 else if(datos.overtimes[x].hour_type === '100%N'){
-                    secret[datos.overtimes[x].secretariat_id ] [3] = datos.overtimes[x].result.toFixed(2);
+                    consu[datos.overtimes[x].secretariat_id ] [3] = parseFloat(datos.overtimes[x].result.toFixed(2))
+                    secret[ref[datos.overtimes[x].secretariat_id]][3] += parseFloat(datos.overtimes[x].result.toFixed(2));
                 }
                    
             }
         }
+
+        secret.sort((a,b)=>{
+            return  b[3] - a[3] 
+        })
+        secret.map((elem,index)=>{
+            ref[elem[0]] = index
+        }
+        )
+
+
         this.setState({
-            consumos:secret,
+            consumos:consu,
+            secretarias:secret,
+            ref:ref
         })
 
 
@@ -93,30 +128,65 @@ class Contenedor extends Component{
         let consumos = {};
         let ref = {};
         let secretarias = datos.budgets;
+        let permitidos = ['1110118000','1110119000','1110122000','1110123000','1110120000',
+        '1110121000','1110104000','1110106000','1110124000','1110108000']
+        let finales = [];
         secretarias.map((elem,index)=>{
-            consumos[elem[0]] = [0,0,0,0]
-            ref[elem[0]] = index;
-            elem.push(0);
+            if(permitidos.indexOf(elem[0]) != -1){
+                consumos[elem[0]] = [0,0,0,0]
+                ref[elem[0]] = finales.length;
+                elem.push(0);
+                finales.push(elem);
+            }
         })
-    
+        let diaFinal = '';
+        let meses31=['01','03','05','07','08','10','12']
+        let meses30=['04','06','09','11'];
+
+        if(meses31.indexOf(this.state.mes) != -1){
+            diaFinal = '31';
+        }
+        else if(meses30.indexOf(this.state.mes) != -1){
+            diaFinal = '30'
+        }
+        else{
+            diaFinal = '28'
+        }
+        
+        let desde = this.state.anio + '-' + this.state.mes + '-' + '01';
+        let hasta = this.state.anio + '-' + this.state.mes + '-' + diaFinal;
         this.setState({
             ref:ref,
-            secretarias:datos.budgets,
-            consumos:consumos
+            secretarias:finales,
+            consumos:consumos,
+            desde:desde,
+            hasta:hasta,
         })
-        this.db.pedir_horas_extras(this.cargarHorasExtras,{desde:this.state.desde,hasta:this.state.hasta})
+
+        
+        this.db.pedir_horas_extras(this.cargarHorasExtras,{desde:desde,hasta:hasta})
     }
 
     pedirJurisdicciones(){
         this.db.pedir_limite_secretarias(this.pedirHorasExtras);
     }
 
+    generarAnios(){
+        let lista = [];
+        let anioInicial = 2017;
+        let anioActual = new Date().getFullYear();
+        for (let x = 0 ; x + anioInicial <= anioActual; x++ ){
+            lista.push( <MenuItem value={anioInicial + x} primaryText={anioInicial + x}/>)
+        }
+        return lista;
+    }
+
     render()
     {
         let panel = null;
         if(this.state.elegido !== ''){
-            console.log(this.state.elegido);
             let secre = this.state.secretarias[this.state.ref[this.state.elegido]];
+            console.log(secre);
             panel = <PanelInfo secretaria={secre[1]} codigo={secre[0]} 
             limite={secre[2]} gastos={this.state.consumos[secre[0]]} desde={this.state.desde}
             hasta={this.state.hasta} ></PanelInfo>
@@ -125,12 +195,23 @@ class Contenedor extends Component{
         return(
             <Paper>
                 <div style={{float:'top'}}>
-                    <TextField value={this.state.desde} floatingLabelText={ <label htmlFor="">Desde</label> } 
+                    {/*<TextField value={this.state.desde} floatingLabelText={ <label htmlFor="">Desde</label> } 
                     onChange={this.actualizar} name='desde' type='date' floatingLabelFixed={true} ></TextField>
                     <TextField value={this.state.hasta} floatingLabelText={ <label htmlFor="">Hasta</label> }
-                    onChange={this.actualizar} name='hasta' type='date' floatingLabelFixed={true}></TextField>
-                    <br/>
-                    <RaisedButton label='Pedir Datos' onClick={this.pedirJurisdicciones} ></RaisedButton>
+                    onChange={this.actualizar} name='hasta' type='date' floatingLabelFixed={true}></TextField>*/}
+                    <SelectField
+                        value={this.state.mes}
+                        floatingLabelText="Mes"
+                        onChange={(e, i, value) => this.setState({mes:value})}>
+                        {this.state.meses}
+                    </SelectField>
+                    <SelectField
+                        value={this.state.anio}
+                        floatingLabelText="Año"
+                        onChange={(e, i, value) => this.setState({ anio:value })}>
+                        {this.generarAnios()}
+                    </SelectField>
+                    <RaisedButton label='Pedir Datos' onClick={this.pedirJurisdicciones} style={{position:'relative',top:'-18px'}} />
                 </div>
                 <Tarjetas secretarias={this.state.secretarias} consumos={this.state.consumos} funAct={this.actualizarElegido}></Tarjetas>
                 {panel}
@@ -166,8 +247,13 @@ class PanelInfo extends Component{
         
     }
 
+    componentDidMount(){
+        if(this.state.codigo){
+            this.pedirDependenciasAsociadas()
+        }
+    }
+
     cargarGastosDependencias(datos){
-        console.log(datos)
         let depen = this.state.dependencias;
         let ref = this.state.ref;
         for (let x = 0; x < datos.overtimes.length; x++){
@@ -176,7 +262,6 @@ class PanelInfo extends Component{
                 depen[ind][depen[ind].length - 1] = datos.overtimes[x]['result'].toFixed(2);
             }
         }
-        console.log(depen);
         this.setState({
             dependencias:depen,
         })
@@ -208,23 +293,21 @@ class PanelInfo extends Component{
     }
 
     cargarDependencias(datos){
-        console.log(datos);
         let dependencias = [];
         let ref={};
         datos.dependencies.map((elem,index)=>{
             elem.push(0);
             elem.push(0);
             dependencias.push(elem);
-            ref[elem[0]]= index;
+            ref[elem[0]]= dependencias.length -1;
         });
         datos['sub-dependencies'].map((elem,index)=>{
             elem.push(0);
             elem.push(0);
             dependencias.push(elem);
-            ref[elem[0]]= index;
+            ref[elem[0]]= dependencias.length - 1;
         });
 
-        console.log(dependencias)
         this.setState({
             dependencias:dependencias,
             ref:ref,
@@ -261,7 +344,10 @@ class PanelInfo extends Component{
             return null;
         }
 
-        return this.state.dependencias.map((elem,index)=>(
+        let depen = this.state.dependencias;
+        depen.sort((a,b)=> b[b.length -1] - a[a.length - 1] )
+
+        return depen.map((elem,index)=>(
             <TarjetaDepen limite={elem[elem.length - 2]} gastado={elem[elem.length - 1]} descripcion={elem[1]} ></TarjetaDepen>
         ))
     }
@@ -340,10 +426,12 @@ class Tarjetas extends Component{
 
 
     render(){
-
+        let tam = window.innerHeight - 200
         return(
-            <div style={{minWidth:'300px',maxWidth:'700px',float:'left'}} >
-                {this.generarTarjetas()}
+            <div style={{minWidth:'400px',maxWidth:'700px',float:'left',height:tam,overflowY:'auto'}} >
+                <List>
+                    {this.generarTarjetas()}    
+                </List>
             </div>
         )
     }
@@ -376,22 +464,23 @@ class Tarjeta extends Component{
     }
 
     marcarActual(evento){
+        console.log(this.state.codigo);
         this.seleccionar(this.state.codigo);
     }
 
     render(){
 
         return( 
-            <Paper style={{display:'inline-block',width:'300px',margin:'10px',height:'90px'}} onClick={this.marcarActual} >
+            <ListItem style={{display:'inline-block',width:'300px',margin:'10px',height:'90px'}} onClick={this.marcarActual} >
                 <div style={{margin:'5px'}}>
                     <label htmlFor="">{this.state.nombre}</label>
                     <br/>
                     <label htmlFor="">Gastado:</label>
-                    <label htmlFor="">${this.state.gastado}</label>
+                    <label htmlFor="">${this.state.gastado.toFixed(2)}</label>
                     <label htmlFor="" style={{marginLeft:'5px'}} > De </label>
                     <label htmlFor="">${this.state.limite}</label>
                 </div>
-            </Paper>
+            </ListItem>
         )
     }
 }
@@ -429,7 +518,6 @@ class TarjetaDepen extends Component{
                     <label style={{width:'30px',display:'inline-block',marginLeft:'5px'}}> de </label>
                     <label htmlFor="">${this.state.limite}</label>         
                 </div>
-                <br/>
             </Paper>
         )
     }

@@ -200,14 +200,15 @@ class Linea extends Component{
 
     render(){
 
-        let boton = <RaisedButton label='Bloquear' secondary={true} onClick={this.bloquear}/>
+        let boton = <RaisedButton label='Bloquear' secondary={true} onClick={this.bloquear}  style={{position:'relative',left:'30px'}} />
         if(this.state.bloqueado){
-            boton = <RaisedButton label='Desbloquear' primary={true} onClick={this.desbloquear}/>
+            boton = <RaisedButton label='Desbloquear' primary={true} onClick={this.desbloquear} style={{position:'relative',left:'30px'}}/>
         }
 
         return(
             <ListItem disabled>
                 <label style={{width:'200px',display:'inline-block'}} >{this.state.nombre}</label>
+                <label style={{width:'200px',dispaly:'inline-block',paddingLeft:'10px'}}>{this.state.codigo}</label>
                 {boton}
             </ListItem>
         )
