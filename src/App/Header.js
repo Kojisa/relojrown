@@ -19,7 +19,7 @@ import Planillones from './GestionPersonal/Planillones';
 import VerPresentes from './Inasistencias/VerPresentes';
 import AsistenciaPorLegajo from './Inasistencias/AsistenciaPorLegajo';
 import HorasExtras from './Dependencias/HorasExtras';
-    
+import Home from './Home/HomeCuentas';
     
     class Nav extends React.Component{
         lista = [ //futuro formato [nombre,icono,funcion]
@@ -40,6 +40,8 @@ import HorasExtras from './Dependencias/HorasExtras';
         crearLista(){
             //let permisos = new PermisosUsuario();
             let lista = [
+                {'nombre':'Principal',
+                funcion:Home},
                 {'nombre':'Datos Basicos',
                 'funcion':DatosBasicos},
                 {'nombre':'Actualización de Inasistencias',
@@ -78,10 +80,15 @@ import HorasExtras from './Dependencias/HorasExtras';
         cambiarEstado(){
             this.setState((prev)=>{return {abierto:!prev.abierto}});
         }
+
+        componentDidMount(){
+            this.setState({titulo:'Principal'},Home());
+        }
     
         componentWillReceiveProps(props){
-            if(props.render){
-                this.setState({render:props.render});
+            if(props.render && props.render !== this.state.render){
+                this.setState({render:props.render,
+                titulo:'Principal'},Home());
             }
             
         }
