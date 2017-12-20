@@ -98,13 +98,11 @@ class Contenedor extends Component{
     }
     
     cargarMeses(datos,indice){
-        console.log(datos);
         let meses = this.state.consumos;
         let dic = this.sumarValores(datos.overtimes);
-        console.log(dic);
         dic.name = this.obtenerMes(indice);
-        let lista = [dic].concat(meses)
-        console.log(lista);
+
+        let lista = [dic].concat(meses);
         let terminar = false;
         let mes = new Date().getMonth() - indice; //para revisar el proximo mes a calcular;
         let anio = new Date().getFullYear();
@@ -117,7 +115,6 @@ class Contenedor extends Component{
         }
 
         let fechas = this.calcularFecha(indice + 1);
-        console.log(fechas);
 
         if(indice > this.state.mesesMaximos || terminar){
             this.setState({
@@ -166,21 +163,20 @@ class Principal extends Component{
 
     render(){  
 
-        console.log(this.state.consumos)
-
+        let largo = 200 + this.state.consumos.length*80;
         return(
             <div style={{display:'inline-block'}}>
                 <span>Comparativa Mensual (Todos los meses al dia de la fecha)</span>
-                <BarChart width={350} height={300} data={this.state.consumos} >
+                <BarChart width={largo} height={300} data={this.state.consumos} >
                     <XAxis dataKey='name'/>
                     <CartesianGrid strokeDasharray="3 3"/>
                     <YAxis />
                     <Legend />
                     <Tooltip />
-                    <Bar dataKey='100%' stackId='a' fill='#8884d8'/>
-                    <Bar dataKey='100%N' stackId='a' fill='#82ca9d'/>
-                    <Bar dataKey='50%' stackId='a' fill='#8310ba' />
-                    <Bar dataKey='50%N' stackId='a' fill='#001319'/>
+                    <Bar dataKey='100%' stackId='a' fill='#8884d8' name='Horas al 100%' />
+                    <Bar dataKey='100%N' stackId='a' fill='#82ca9d' name='Nocturnidad al 100%' />
+                    <Bar dataKey='50%' stackId='a' fill='#8310ba' name='Horas al 50%' />
+                    <Bar dataKey='50%N' stackId='a' fill='#001319' name='Nocturnidad al 50%' />
                 </BarChart>
             </div>
         )

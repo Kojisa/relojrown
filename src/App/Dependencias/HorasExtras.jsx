@@ -4,6 +4,8 @@ import {TextField,Paper,RaisedButton,List,ListItem,
     Divider,Tab,Tabs,MenuItem,SelectField} from 'material-ui';
 import MUICont from 'material-ui/styles/MuiThemeProvider';
 import DBHandler from '../DBHandler.js';
+import {} from 'recharts'
+
 
 export default function main(){
     let root = document.getElementById('main');
@@ -259,7 +261,7 @@ class PanelInfo extends Component{
         for (let x = 0; x < datos.overtimes.length; x++){
             if(datos.overtimes[x]['dependence_id'] in ref){
                 let ind = ref[datos.overtimes[x]['dependence_id']];
-                depen[ind][depen[ind].length - 1] = datos.overtimes[x]['result'].toFixed(2);
+                depen[ind][depen[ind].length - 1] += datos.overtimes[x]['result'].toFixed(2);
             }
         }
         this.setState({
@@ -367,7 +369,14 @@ class PanelInfo extends Component{
                     <Tabs>
                         <Tab label='Secretaria' >
                             <label >Gastos del periodo Seleccionado : </label>
-                            <label htmlFor=""> {gastoTotal}</label>
+                            <label htmlFor="">Horas al 50%: {this.state.gastos[0].toFixed(2)}</label>
+                            <br/>
+                            <label htmlFor="">Horas al 100%: {this.state.gastos[1].toFixed(2)}</label>
+                            <br/>
+                            <label htmlFor="">Nocturnidad al 50%: {this.state.gastos[2].toFixed(2)}</label>
+                            <br/>
+                            <label htmlFor="">Nocturnidad al 100%: {this.state.gastos[3].toFixed(2)}</label>
+                            <br/>
 
                         </Tab>
                         <Tab label='Dependencias'>
