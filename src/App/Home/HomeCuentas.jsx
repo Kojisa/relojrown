@@ -170,7 +170,7 @@ class Principal extends Component{
                 <BarChart width={largo} height={300} data={this.state.consumos} >
                     <XAxis dataKey='name'/>
                     <CartesianGrid strokeDasharray="3 3"/>
-                    <YAxis />
+                    <YAxis width={100} />
                     <Legend />
                     <Tooltip />
                     <Bar dataKey='100%' stackId='a' fill='#8884d8' name='Horas al 100%' />
