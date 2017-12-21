@@ -6,7 +6,7 @@ import DepuracionLicenciasAnuales from './Licencias/DepuracionLicenciasAnuales.j
 import CreacionConceptos from './Conceptos/CreacionConceptos.js';
 import limitePresu from './Dependencias/LimitePresupuestario.js';
 import muestraPresu from './Dependencias/MuestraPresupuesto.js';
-import bloquearDepend from './Dependencias/BloquearDependencias.js';
+import bloquearDepend from './Dependencias/BloquearDependencias.jsx';
 import React from "react";
 import db from './DBHandler';
 import injectTapPlugin from 'react-tap-event-plugin';
@@ -219,7 +219,7 @@ import Home from './Home/HomeCuentas';
                 <div >
                     <Nav  render={this.state.render} ref={(elem)=>{this.nav = elem}} abierto={this.state.estadoNav}/>
                     <div ref={(elem)=>{this.mainCont=elem;if(elem)elem.limpiar=limpiarCont}} id="main" 
-                    style={{display:"inline-block",overflowY:"auto",height:"100%",width:"90%",marginTop:'60px'}} >
+                    style={{display:"inline-block",overflowY:"auto",height:"100%",width:"100%",marginTop:'60px'}} >
                     
                     </div>
                 </div>)

@@ -8,9 +8,9 @@ import DBHandler from '../DBHandler.js';
 export default function main(){
     let root = document.getElementById('main');
     root.limpiar();
-
+    let tam = window.innerHeight - 150;
     ReactDOM.render(
-        <div style={{margin:"30px"}}>
+        <div style={{margin:"30px",height:tam}}>
             <MUICont>
                 <Contenedor/>
             </MUICont>
@@ -33,7 +33,8 @@ class Contenedor extends Component{
             horarios:[], //horario laboral asociado al legajo
             desde:'',
             hasta:'',
-            registros:[] //registros de fichada
+            registros:[], //registros de fichada
+            originales:[],
         }
         this.db = new DBHandler();
         this.actualizar = this.actualizar.bind(this);
@@ -50,9 +51,11 @@ class Contenedor extends Component{
         });
     }
 
-    actualizarRegistro(pos,info){
+
+    //tipo 0 es entrada tipo 1 es salida
+    actualizarRegistro(pos,info,tipo){
         let registros = this.state.registros;
-        registros[pos] = info;
+        registros[pos][tipo] = info;
         this.setState({
             regsitros:registros
         });
@@ -64,19 +67,24 @@ class Contenedor extends Component{
     }
 
     pedirRegistros(){
-        this.db.enviarPeticion((datos)=>(console.log(datos)),'api/0.1/attendance/'+this.state.legajo,'POST',{from_date:this.state.desde,to_date:this.state.hasta},true);
+        this.db.enviarPeticion((datos)=>(this.setState({
+            registros:datos.attendance,
+            originales:datos.attendance,
+        }
+            )),'api/0.1/attendance/'+this.state.legajo,'POST',{from_date:this.state.desde,to_date:this.state.hasta},true);
     }
 
 
     render(){
 
         let registros = null;
+        
         if(this.state.registros.length > 0){
             registros = <MuestraRegistros registros={this.state.registros} funAct={this.actualizarRegistro}/>
         }
 
         return(
-            <div>
+            <div style={{height:'100%'}} >
                 <Paper style={{minWidth:'400px',display:'inline-block'}} >
                     <div style={{margin:'5px'}}>
                         <TextField value={this.state.legajo}  onChange={this.actualizar} name='legajo'
@@ -95,9 +103,9 @@ class Contenedor extends Component{
                         <RaisedButton label='Pedir' onClick={this.pedirRegistros} primary={true} style={{marginLeft:'300px'}}> </RaisedButton>
                     </div>
                 </Paper>
-                <div style={{display:'inline-block'}} >
-                    {registros}
-                </div>
+                
+                {registros}
+                
             </div>
             
         )
@@ -130,22 +138,9 @@ class MuestraRegistros extends Component{
         let lista = this.state.registros;
         let final = [];
         let aux = 0; //contabiliza las entradas para ver si agrega separador
-        for( let x = 0; x < lista.length; x = x + 2){
-            console.log(x);
-            let regs = []
-            let fecha1 = lista[x][0];
-            let registro1 = lista[x][1]; //id del registro
-            let entrada1 = lista[x][2];
-            
-            regs.push([fecha1,registro1,entrada1]);
+        for( let x = 0; x < lista.length; x ++){           
 
-            let fecha2 = lista[x + 1][0];
-            let registro2 = lista[x + 1][1];
-            let entrada2 = lista[x + 1][2];
-
-            regs.push([fecha2,registro2,entrada2]);
-
-            let item = <ParRegistros registros={regs} indice={x} funAct={this.actualizarRegistro} />
+            let item = <ParRegistros registros={lista[x]} indice={x} funAct={this.actualizarRegistro} />
  
             final.push(item);
         }
@@ -158,7 +153,7 @@ class MuestraRegistros extends Component{
     render(){
 
         return(
-            <Paper style={{width:'400px',overflowY:'scroll',height:'70%'}} >
+            <Paper style={{width:'400px',overflowY:'auto',height:'80%'}} >
                 <div style={{margin:'5px'}} >
                     <List>
                         {this.cargarRegistros()}
@@ -192,8 +187,8 @@ class ParRegistros extends Component{
     cargarRegistros(){
         
         return this.state.registros.map((elem,index)=>(
-            <Registro funAct={this.actualizarRegistro} fecha={elem[0]}
-            registro={elem[1]} entrada={elem[2]} indice={this.state.indice + index} />
+            <Registro funAct={this.actualizarRegistro} fecha={elem}
+            indice={this.state.indice} entrada={index} />
         ))
     }
 
@@ -225,9 +220,8 @@ class Registro extends Component{
         this.state={
             hora:props.fecha.split('T')[1],
             dia:props.fecha.split('T')[0],
-            registro:props.registro,
             indice:props.indice,
-            entrada:props.entrada, //esto es un bool, si es true fue marcado como entrada, si es false, fue marcado como salida.
+            tipo:props.entrada, //esto es un int, si es 0 fue marcado como entrada, si es 1, fue marcado como salida.
         }
         this.actualizarRegistro = this.actualizarRegistro.bind(this);
         this.actualizar = props.funAct;
@@ -237,9 +231,8 @@ class Registro extends Component{
         this.setState({
             hora:props.fecha.split('T')[1],
             dia:props.fecha.split('T')[0],
-            registro:props.registro,
             indice:props.indice,
-            entrada:props.entada,
+            tipo:props.entada,
         })
     }
 
@@ -248,10 +241,10 @@ class Registro extends Component{
             hora:this.state.hora,
             dia:this.state.dia,
             registro:this.state.registro,
-            entrada:this.state.entrada
+            tipo:this.state.entrada
         }
 
-        datos[evento.target.name] = evento.target.value;
+        
         this.actualizar(this.indice,datos);
 
     }
@@ -260,7 +253,7 @@ class Registro extends Component{
 
         let boton = <RaisedButton label='Entrada' primary={true} 
         onChange={()=>(this.actualizarRegistro({target:{name:'entrada',value:true}}))} />
-        if(!this.state.entrada){
+        if(!this.state.tipo == 0){
             boton = <RaisedButton label='Salida' secondary={true} 
             onChange={()=>(this.actualizarRegistro({target:{name:'entrada',value:false}}))} />
         }
@@ -273,8 +266,6 @@ class Registro extends Component{
                 
                 <TextField floatingLabelText={ <label htmlFor="">Hora</label> } value={this.state.hora}
                 onChange={this.actualizarRegistro} name='hora' type='time' style={{width:'80px'}}/>
-
-                {boton}
             </div>
         )
     }

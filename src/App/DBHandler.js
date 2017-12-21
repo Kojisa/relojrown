@@ -16,7 +16,6 @@ export default class DBHandler{
             anio += 1;
         }
         let armarDatos = {
-            'dependence_id':datos.codigo,
             'amount':datos.nuevo,
             'year': anio,
             'month':mes,
@@ -24,9 +23,11 @@ export default class DBHandler{
         let extra;
         if(tipo === 'dependencias'){
             extra = 'dependencies';
+            armarDatos['dependence_id']=datos.codigo;
         }
         else{
-            extra ='secretariet'
+            extra ='secretariat'
+            armarDatos['secretariat_id'] = datos.codigo;
         }
         
         if(datos.repeticion == 12){

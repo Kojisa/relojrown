@@ -8,9 +8,9 @@ import DBHandler from '../DBHandler.js';
 export default function main(){
     let root = document.getElementById('main');
     root.limpiar();
-
+    let tam = window.innerHeight -150;
     ReactDOM.render(
-        <div style={{margin:"30px"}}>
+        <div style={{margin:"30px",height:tam}}>
             <MUICont>
                 <Contenedor/>
             </MUICont>
@@ -60,12 +60,14 @@ class Contenedor extends Component{
     render(){
 
         return(
-            <Paper style={{width:'400px'}} >
+            <div style={{width:'400px',height:'95%'}} >
                 <div style={{marginBottom:'10px'}} >
                     <RaisedButton label='Actualizar' onClick={this.pedirAsistentes} ></RaisedButton>  
                 </div>
-                {this.cargarPresentes()}
-            </Paper>
+                <div style={{height:'95%',overflowY:'auto'}}>
+                    {this.cargarPresentes()}
+                </div>
+            </div>
         )
     }
 }
@@ -106,7 +108,7 @@ class Linea extends Component{
     render(){
 
         return(
-            <div style={{marginBottom:'10px'}}>
+            <Paper style={{marginBottom:'20px'}}>
                 <label htmlFor="" style={{width:'50px',display:'inline-block'}} >{this.state.legajo} - </label>
                 <label htmlFor=""  >{this.state.apellido},</label>
                 <label htmlFor=""  >{'' + this.state.nombre}</label>
@@ -116,8 +118,7 @@ class Linea extends Component{
                 <label htmlFor="">{this.armarFecha()}</label>
                 <label htmlFor="" style={{marginLeft:'5px'}}> Hora:</label>
                 <label htmlFor="">{this.state.horario.split('T')[1]}</label>
-                <Divider></Divider>
-            </div>
+            </Paper>
         )
     }
 }

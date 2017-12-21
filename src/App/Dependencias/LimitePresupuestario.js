@@ -10,9 +10,9 @@ export default function main(props){
     let root = document.getElementById('main');
     root.limpiar();
 
-
+    let tam = window.innerHeight - 100;
     ReactDOM.render(
-        <div style={{margin:"30px"}}>
+        <div style={{margin:"10px",height:tam}}>
             <MUICont>
                 <Contenedor/>
             </MUICont>
@@ -81,14 +81,14 @@ class Contenedor extends Component{
     render(){
 
         return(
-            <div>
+            <div style={{height:'100%'}} >
                 
                 <BarraFiltrado funAct={this.actualizar}/>
-                <Tabs>
-                    <Tab label='Secretarias'>
+                <Tabs style={{height:'90%'}} contentContainerStyle={{height:'90%',overflowY:'auto'}}>
+                    <Tab label='Secretarias ' style={{height:'100%'}}>
                         <Listado tipo='secretarias' lista={this.state.secretarias} funAct={this.actualizar} filtrado={this.state.filtro}></Listado>
                     </Tab>
-                    <Tab label='Dependencias' >
+                    <Tab label='Dependencias' style={{height:'100%'}} >
                         <Listado tipo='dependencias' lista={this.state.dependencias} funAct={this.actualizar} filtrado={this.state.filtro}/>
                     </Tab>
                 </Tabs>
@@ -146,9 +146,11 @@ class Listado extends Component {
   render(){
 
     return(
-      <List>
-          {this.cargarListado()}
-      </List>
+        <div style={{height:'70%'}}>
+            <List style={{height:'70%',overflowY:'auto'}}>
+                {this.cargarListado()}
+            </List>
+        </div>
     )
   }
 

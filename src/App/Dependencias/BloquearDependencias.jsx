@@ -53,11 +53,14 @@ class Contenedor extends Component{
     ajustarDependencias(datos){
         let depen = datos['dependencies'].concat(datos['sub-dependencies']);
         let dependencias = this.state.dependencias;
+        console.log(depen);
         let ref = this.state.dic;
         for (let x = 0; x < depen.length; x++){
             let indice = ref[depen[x][0]];
+            console.log(indice);
             dependencias[indice][3] = true
         }
+        console.log(dependencias)
         this.setState({dependencias:dependencias});
         
 
@@ -68,7 +71,8 @@ class Contenedor extends Component{
         let depen = datos.dependencies;
         let subDep = datos['sub-dependencies'];
         todas = depen.concat(subDep);
-        todas.map((elem)=>{if(elem.length == 2){elem.push(null);}elem.push(false);elem.push(false)});
+        console.log(subDep)
+        todas.map((elem)=>{if(elem.length == 4){elem.splice(2,1);}elem.push(false);elem.push(false)});
         todas.sort((a,b)=>{return a[1].localeCompare(b[1])});
         let dic = {};
         todas.map((elem,index)=>(dic[elem[0]]=index));
@@ -86,9 +90,9 @@ class Contenedor extends Component{
 
 
     render(){
-
+        let tam = window.innerHeight - 150;
         return(
-            <div>
+            <div style={{height:tam,width:'100%'}} >
                 
                 <BarraFiltrado funAct={this.actualizar}/>
                 <Listado lista={this.state.dependencias} funAct={this.actualizar} filtrado={this.state.filtro} actualizarDependencia={this.actualizarDependencia}/>
@@ -138,7 +142,7 @@ class Listado extends Component {
   render(){
 
     return(
-      <List>
+      <List style={{height:'85%',width:'100%',overflowY:'auto'}}>
           {this.cargarListado()}
       </List>
     )
@@ -226,7 +230,7 @@ class BarraFiltrado extends Component{
 
 
         return(
-            <div>
+            <div style={{display:'block'}} >
                 <TextField onChange={(evento)=>{this.actualizarPadre(evento.target.value,'filtro')}}
                     floatingLabelText={<label>Filtrar por Nombre</label>}/>
             </div>
