@@ -60,6 +60,12 @@ export default class DBHandler{
             end_date:datos.hasta},true);*/
     }
 
+    pedir_horas_extras_empleado(fun,datos){
+        this.enviarPeticion(fun,'api/0.1/overtime/employee/'+datos.legajo,'POST',{
+            initial_date:datos.desde,
+            end_date:datos.hasta},true);
+    }
+
     pedir_historial_presentismo(fun,datos){
         this.enviarPeticion(fun,'api/0.1/attendance/'+datos.legajo,'POST',{from_date:datos.from_date,to_date:datos.to_date},true);
     }
