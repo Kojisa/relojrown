@@ -30,6 +30,7 @@ class Contenedor extends Component{
             secretarias:[
                 
             ],
+            gastoTotal:0,
             consumos:{
 
             },
@@ -84,8 +85,10 @@ class Contenedor extends Component{
         let consu = this.state.consumos;
         let ref = this.state.ref;
         let secret = this.state.secretarias;
+        let gastoTotal = 0;
         for(let x = 0; x < datos.overtimes.length; x++){
             if(datos.overtimes[x].secretariat_id in consu){
+                gastoTotal += parseFloat(datos.overtimes[x].result.toFixed(2));
                 if(datos.overtimes[x].hour_type === '50%'){
                     consu[datos.overtimes[x].secretariat_id ][0] = parseFloat(datos.overtimes[x].result.toFixed(2))
                     secret[ref[datos.overtimes[x].secretariat_id]][3] += parseFloat(datos.overtimes[x].result.toFixed(2));
@@ -120,7 +123,8 @@ class Contenedor extends Component{
         this.setState({
             consumos:consu,
             secretarias:secret,
-            ref:ref
+            ref:ref,
+            gastoTotal:gastoTotal,
         })
 
 
@@ -131,7 +135,7 @@ class Contenedor extends Component{
         let ref = {};
         let secretarias = datos.budgets;
         let permitidos = ['1110118000','1110119000','1110122000','1110123000','1110120000',
-        '1110121000','1110104000','1110106000','1110124000','1110108000']
+        '1110121000','1110104000','1110106000','1110124000','1110108000','1110100000']
         let finales = [];
         secretarias.map((elem,index)=>{
             if(permitidos.indexOf(elem[0]) != -1){
@@ -183,6 +187,29 @@ class Contenedor extends Component{
         return lista;
     }
 
+    ponerPuntuacion(numero){
+        
+        let texto = numero.toString();
+        let coma = texto.indexOf('.');
+        texto = texto.replace('.',',');
+        let final = texto.substr(coma,3);
+        let aux = 0;
+        
+        for (let x = coma - 1; x >= 0; x--){
+            final = texto[x] + final;
+            aux += 1;
+            if(aux === 3){
+                final = '.' + final;
+                aux = 0;
+            }
+
+        }
+        if(final[0] === '.'){
+            final = final.substr(1,final.length - 1)
+        }
+        return final;
+    }
+
     render()
     {
         let panel = null;
@@ -192,6 +219,16 @@ class Contenedor extends Component{
             panel = <PanelInfo secretaria={secre[1]} codigo={secre[0]} 
             limite={secre[2]} gastos={this.state.consumos[secre[0]]} desde={this.state.desde}
             hasta={this.state.hasta} ></PanelInfo>
+        }
+
+        let gastoTotal = null;
+
+        if(this.state.gastoTotal != 0 ){
+            gastoTotal = (
+                <Paper>
+                    <span>Gasto total en el periodo seleccionado: ${this.ponerPuntuacion(this.state.gastoTotal.toFixed(2))}</span>
+                </Paper>
+            )
         }
 
         return(
@@ -215,6 +252,8 @@ class Contenedor extends Component{
                     </SelectField>
                     <RaisedButton label='Pedir Datos' onClick={this.pedirJurisdicciones} style={{position:'relative',top:'-18px'}} />
                 </div>
+                {gastoTotal}
+                <br/>
                 <Tarjetas secretarias={this.state.secretarias} consumos={this.state.consumos} funAct={this.actualizarElegido}></Tarjetas>
                 {panel}
             </Paper>
@@ -353,6 +392,28 @@ class PanelInfo extends Component{
             <TarjetaDepen limite={elem[elem.length - 2]} gastado={elem[elem.length - 1]} descripcion={elem[1]} ></TarjetaDepen>
         ))
     }
+    ponerPuntuacion(numero){
+        
+        let texto = numero.toString();
+        let coma = texto.indexOf('.');
+        texto = texto.replace('.',',');
+        let final = texto.substr(coma,3);
+        let aux = 0;
+        
+        for (let x = coma - 1; x >= 0; x--){
+            final = texto[x] + final;
+            aux += 1;
+            if(aux === 3){
+                final = '.' + final;
+                aux = 0;
+            }
+
+        }
+        if(final[0] === '.'){
+            final = final.substr(1,final.length - 1)
+        }
+        return final;
+    }
 
     render(){
 
@@ -368,15 +429,15 @@ class PanelInfo extends Component{
                     <br/>
                     <Tabs>
                         <Tab label='Secretaria' >
-                            <label >Gastos del periodo Seleccionado : ${gastoTotal.toFixed(2)} </label>
+                            <label >Gastos del periodo Seleccionado : ${this.ponerPuntuacion(gastoTotal.toFixed(2))} </label>
                             <br/>
-                            <label htmlFor="">Horas al 50%: ${this.state.gastos[0].toFixed(2)}</label>
+                            <label htmlFor="">Horas al 50%: ${this.ponerPuntuacion(this.state.gastos[0].toFixed(2))}</label>
                             <br/>
-                            <label htmlFor="">Horas al 100%: ${this.state.gastos[1].toFixed(2)}</label>
+                            <label htmlFor="">Horas al 100%: ${this.ponerPuntuacion(this.state.gastos[1].toFixed(2))}</label>
                             <br/>
-                            <label htmlFor="">Nocturnidad al 50%: ${this.state.gastos[2].toFixed(2)}</label>
+                            <label htmlFor="">Nocturnidad al 50%: ${this.ponerPuntuacion(this.state.gastos[2].toFixed(2))}</label>
                             <br/>
-                            <label htmlFor="">Nocturnidad al 100%: ${this.state.gastos[3].toFixed(2)}</label>
+                            <label htmlFor="">Nocturnidad al 100%: ${this.ponerPuntuacion(this.state.gastos[3].toFixed(2))}</label>
                             <br/>
 
                         </Tab>
@@ -477,6 +538,28 @@ class Tarjeta extends Component{
         console.log(this.state.codigo);
         this.seleccionar(this.state.codigo);
     }
+    ponerPuntuacion(numero){
+        
+        let texto = numero.toString();
+        let coma = texto.indexOf('.');
+        texto = texto.replace('.',',');
+        let final = texto.substr(coma,3);
+        let aux = 0;
+        
+        for (let x = coma - 1; x >= 0; x--){
+            final = texto[x] + final;
+            aux += 1;
+            if(aux === 3){
+                final = '.' + final;
+                aux = 0;
+            }
+
+        }
+        if(final[0] === '.'){
+            final = final.substr(1,final.length - 1)
+        }
+        return final;
+    }
 
     render(){
 
@@ -485,8 +568,8 @@ class Tarjeta extends Component{
                 <div style={{margin:'5px'}}>
                     <label htmlFor="">{this.state.nombre}</label>
                     <br/>
-                    <label htmlFor="">Gastado:</label>
-                    <label htmlFor="">${this.state.gastado.toFixed(2)}</label>
+                    <label htmlFor="">Gastado: </label>
+                    <label htmlFor=""> ${this.ponerPuntuacion(this.state.gastado.toFixed(2))}</label>
                     <label htmlFor="" style={{marginLeft:'5px'}} > De </label>
                     <label htmlFor="">${this.state.limite}</label>
                 </div>
@@ -515,6 +598,28 @@ class TarjetaDepen extends Component{
             gastado:props.gastado
         })
     }
+    ponerPuntuacion(numero){
+        
+        let texto = numero.toString();
+        let coma = texto.indexOf('.');
+        texto = texto.replace('.',',');
+        let final = texto.substr(coma,3);
+        let aux = 0;
+        
+        for (let x = coma - 1; x >= 0; x--){
+            final = texto[x] + final;
+            aux += 1;
+            if(aux === 3){
+                final = '.' + final;
+                aux = 0;
+            }
+
+        }
+        if(final[0] === '.'){
+            final = final.substr(1,final.length - 1)
+        }
+        return final;
+    }
 
     render(){
 
@@ -524,7 +629,7 @@ class TarjetaDepen extends Component{
                     <label htmlFor="">{this.state.descripcion}</label>
                     <br/>
                     <label style={{width:'70px', display:'inline-block'}} >Gastado: </label>
-                    <label htmlFor="">${this.state.gastado}</label>
+                    <label htmlFor=""> ${this.ponerPuntuacion(this.state.gastado.toFixed(2))}</label>
                     <label style={{width:'30px',display:'inline-block',marginLeft:'5px'}}> de </label>
                     <label htmlFor="">${this.state.limite}</label>         
                 </div>

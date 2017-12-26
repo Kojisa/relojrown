@@ -261,11 +261,11 @@ class DatosBasicos extends Component{
     render(){
 
         let dependencia = null;
-        if(this.state.dependencias.length != 0){
+        /*if(this.state.dependencias.length != 0){
             dependencia = <AutoComplete floatingLabelText={ <label htmlFor="">Dependencia(Horas Extras)</label> } 
             searchText={this.state.dependencia} dataSource={this.state.dependencias} filter={AutoComplete.caseInsensitiveFilter} 
             />
-        }
+        }*/
 
         return(
             <div style={{width:'350px',display:'inline-block'}} >

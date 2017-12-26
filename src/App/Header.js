@@ -5,7 +5,6 @@ import ActualizacionInasistencias from './Inasistencias/ActualizacionInasistenci
 import DepuracionLicenciasAnuales from './Licencias/DepuracionLicenciasAnuales.js'
 import CreacionConceptos from './Conceptos/CreacionConceptos.js';
 import limitePresu from './Dependencias/LimitePresupuestario.js';
-import muestraPresu from './Dependencias/MuestraPresupuesto.js';
 import bloquearDepend from './Dependencias/BloquearDependencias.jsx';
 import React from "react";
 import db from './DBHandler';
@@ -50,8 +49,6 @@ import Home from './Home/HomeCuentas';
                 'funcion':DepuracionLicenciasAnuales},
                 {'nombre':'Limite Presupuestario',
                 'funcion':limitePresu},
-                {'nombre':'Muestra de Gastos',
-                'funcion':muestraPresu},
                 {'nombre':'Bloquear Dependencias',
                 'funcion':bloquearDepend},
                 {'nombre':'Conceptos',
