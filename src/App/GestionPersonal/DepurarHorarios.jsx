@@ -41,6 +41,9 @@ class Contenedor extends Component{
         this.pedirRegistros = this.pedirRegistros.bind(this);
         this.actualizarRegistro = this.actualizarRegistro.bind(this);
         this.obtenerNombre = this.obtenerNombre.bind(this);
+
+        this.borrarRegistro = this.borrarRegistro.bind(this);
+        this.mandarRegistros = this.mandarRegistros.bind(this);
     }
 
     actualizar(evento){
@@ -57,7 +60,7 @@ class Contenedor extends Component{
         let registros = this.state.registros;
         registros[pos][tipo] = info;
         this.setState({
-            regsitros:registros
+            registros:registros
         });
 
     } 
@@ -74,13 +77,21 @@ class Contenedor extends Component{
             )),'api/0.1/attendance/'+this.state.legajo,'POST',{from_date:this.state.desde,to_date:this.state.hasta},true);
     }
 
+    borrarRegistro(pos){
+        this.db.borrar_presencia(this.pedirRegistros,{original:this.state.originales[pos]})
+    }
+
+    mandarRegistros(pos){
+        this.db.actualizar_presencia(null,{original:this.state.originales[pos],registro:this.state.registros[pos]})
+    }
 
     render(){
 
         let registros = null;
         
         if(this.state.registros.length > 0){
-            registros = <MuestraRegistros registros={this.state.registros} funAct={this.actualizarRegistro}/>
+            registros = <MuestraRegistros registros={this.state.registros} funMan={this.mandarRegistros}
+             funAct={this.actualizarRegistro} funBor={this.borrarRegistro} />
         }
 
         return(
@@ -122,7 +133,8 @@ class MuestraRegistros extends Component{
         }
 
         this.actualizarRegistro = props.funAct;
-
+        this.mandarRegistros = props.funMan;
+        this.borrarRegistro = props.funBor;
         this.cargarRegistros = this.cargarRegistros.bind(this);
     }
 
@@ -140,7 +152,8 @@ class MuestraRegistros extends Component{
         let aux = 0; //contabiliza las entradas para ver si agrega separador
         for( let x = 0; x < lista.length; x ++){           
 
-            let item = <ParRegistros registros={lista[x]} indice={x} funAct={this.actualizarRegistro} />
+            let item = <ParRegistros registros={lista[x]} indice={x} funMan={this.mandarRegistros}
+            funAct={this.actualizarRegistro} funBor={this.borrarRegistro} />
  
             final.push(item);
         }
@@ -175,6 +188,8 @@ class ParRegistros extends Component{
 
         this.cargarRegistros = this.cargarRegistros.bind(this);
         this.actualizarRegistro = props.funAct;
+        this.mandarRegistros = props.funMan;
+        this.borrarRegistro = props.funBor;
     }
 
     componentWillReceiveProps(props){
@@ -199,7 +214,11 @@ class ParRegistros extends Component{
                 <div>
                     {this.cargarRegistros()}
                     <br/>
-                    <RaisedButton label='Actualizar Par' primary={true}/>
+                    <RaisedButton label='Actualizar Par' primary={true} onClick={()=>this.mandarRegistros(this.state.indice)}/>
+                    <RaisedButton
+                        secondary={true}
+                        label="Borrar Registro"
+                        onClick={()=>this.borrarRegistro(this.state.indice)} />
                     <br/>
                     <Divider/>
                 </div>
