@@ -58,7 +58,7 @@ class Contenedor extends Component{
     //tipo 0 es entrada tipo 1 es salida
     actualizarRegistro(pos,info,tipo){
         let registros = this.state.registros;
-        registros[pos][tipo] = info;
+        registros[pos][tipo] = info.dia + 'T' + info.hora;
         this.setState({
             registros:registros
         });
@@ -78,11 +78,11 @@ class Contenedor extends Component{
     }
 
     borrarRegistro(pos){
-        this.db.borrar_presencia(this.pedirRegistros,{original:this.state.originales[pos]})
+        this.db.borrar_presencia(this.pedirRegistros,{original:this.state.originales[pos],legajo:this.state.legajo})
     }
 
     mandarRegistros(pos){
-        this.db.actualizar_presencia(null,{original:this.state.originales[pos],registro:this.state.registros[pos]})
+        this.db.actualizar_presencia(null,{original:this.state.originales[pos],registro:this.state.registros[pos],legajo:this.state.legajo})
     }
 
     render(){
@@ -263,8 +263,15 @@ class Registro extends Component{
             tipo:this.state.entrada
         }
 
+        if(evento.target.name='dia'){
+            datos.dia =evento.target.value;
+        }
+        if(evento.target.name='hora'){
+            datos.hora = evento.target.value;
+        }
+
         
-        this.actualizar(this.indice,datos);
+        this.actualizar(this.state.indice,datos,this.state.tipo);
 
     }
 

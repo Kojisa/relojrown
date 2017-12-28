@@ -65,13 +65,13 @@ export default class DBHandler{
         old_check_out:datos.original[1],
         check_in:datos.registro[0],
         check_out:datos.registro[1]};
-        this.enviarPeticion(fun,'api/0.1/attendance/update','POST',dic,true);
+        this.enviarPeticion(fun,'api/0.1/attendance/'+ datos.legajo + '/update','POST',dic,true);
     }
 
     borrar_presencia(fun,datos){
         let dic = {check_in:datos.original[0],
         check_out:datos.original[1]};
-        this.enviarPeticion(fun,'api/0.1/attendance/delete','POST',dic,true);
+        this.enviarPeticion(fun,'api/0.1/attendance/'+ datos.legajo + '/delete','POST',dic,true);
     }
 
     pedir_horas_extras_empleado(fun,datos){
