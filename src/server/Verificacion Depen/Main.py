@@ -32,3 +32,6 @@ def main():
             res = cur.fetchall()
             if( len(res) == 0):
                 print ("La dependencia " + tab['A'+str(y)].value + " no pertenece a la jurisdiccion informada: " + jurisdiccion)
+
+
+main()
