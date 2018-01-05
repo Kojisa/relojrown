@@ -37,12 +37,12 @@ def main():
             nombre = tab['A'+str(y)].value
             
             if( depen == None or len( depen ) == 0):
-                salida.write("La dependencias " + nombre + " no tiene codigo declarado. Jurisdiccion deseada: " + jurisdiccion + "\n")
+                salida.write("La dependencias " + nombre + " no tiene codigo declarado. Jurisdiccion deseada: " + str(jurisdiccion) + "\n")
 
-            cur.execute(orden.format(depen,jurisdiccion))
+            cur.execute(orden.format(depen,str(jurisdiccion)))
             res = cur.fetchall()
             if( len(res) == 0):
-                salida.write("La dependencia " + nombre + " no pertenece a la jurisdiccion informada: " + jurisdiccion + "\n")
+                salida.write("La dependencia " + nombre + " no pertenece a la jurisdiccion informada: " + str(jurisdiccion) + "\n")
     salida.close()
 
 main()
