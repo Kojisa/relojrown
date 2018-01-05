@@ -1,3 +1,4 @@
+#coding=latin
 import openpyxl
 import Conectar
 
@@ -36,13 +37,16 @@ def main():
             depen = tab['B'+str(y)].value
             nombre = tab['A'+str(y)].value
             
+            if( nombre == None and depen == None):
+                continue
+
             if( depen == None or len( depen ) == 0):
-                salida.write("La dependencias " + nombre + " no tiene codigo declarado. Jurisdiccion deseada: " + str(jurisdiccion) + "\n")
+                salida.write("La dependencias " + nombre.encode('utf8').strip() + " no tiene codigo declarado. Jurisdiccion deseada: " + str(jurisdiccion) + "\n")
 
             cur.execute(orden.format(depen,str(jurisdiccion)))
             res = cur.fetchall()
             if( len(res) == 0):
-                salida.write("La dependencia " + nombre + " no pertenece a la jurisdiccion informada: " + str(jurisdiccion) + "\n")
+                salida.write(u"La dependencia " + nombre + " no pertenece a la jurisdiccion informada: " + str(jurisdiccion) + "\n")
     salida.close()
 
 main()
