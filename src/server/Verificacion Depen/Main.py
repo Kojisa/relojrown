@@ -31,6 +31,8 @@ def main():
     for x in range( len( obtenerSolapas(archivo) ) ):
         tab = devolverSolapa(archivo,x)
         jurisdiccion = tab['C1'].value
+        if( x == 3):
+            jurisdiccion = tab['C2'].value
         
         for y in range(1,tab.max_row + 1):
             
