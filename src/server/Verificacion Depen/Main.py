@@ -11,7 +11,7 @@ def obtenerSolapas(archivo):
 
 
 def devolverSolapa(archivo,indice):
-    return archivo[archivo.obtenerSolapas[indice]]
+    return archivo[obtenerSolapas(archivo)[indice]]
 
 def abrirArchivo():
     arch = openpyxl.load_workbook(ARCHIVO)
