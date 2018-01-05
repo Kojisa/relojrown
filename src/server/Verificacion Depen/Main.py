@@ -36,7 +36,7 @@ def main():
             depen = tab['B'+str(y)].value
             nombre = tab['A'+str(y)].value
             
-            if( len( depen ) == 0):
+            if( depen == None or len( depen ) == 0):
                 salida.write("La dependencias " + nombre + " no tiene codigo declarado. Jurisdiccion deseada: " + jurisdiccion + "\n")
 
             cur.execute(orden.format(depen,jurisdiccion))
