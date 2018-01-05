@@ -26,9 +26,9 @@ def main():
     con,cur = Conectar.conectar()
     for x in range( len( obtenerSolapas(archivo) ) ):
         tab = devolverSolapa(archivo,x)
-        jurisdiccion = tab['C1']
+        jurisdiccion = tab['C1'].value
         for y in range(tab.max_row):
-            cur.execute(orden.format(tab['B'+str(y)].value))
+            cur.execute(orden.format(tab['B'+str(y)].value,jurisdiccion))
             res = cur.fetchall()
             if( len(res) == 0):
                 print ("La dependencia " + tab['A'+str(y)].value + " no pertenece a la jurisdiccion informada: " + jurisdiccion)
