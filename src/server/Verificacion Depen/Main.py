@@ -46,7 +46,7 @@ def main():
             cur.execute(orden.format(depen,str(jurisdiccion)))
             res = cur.fetchall()
             if( len(res) == 0):
-                salida.write(u"La dependencia " + nombre + " no pertenece a la jurisdiccion informada: " + str(jurisdiccion) + "\n")
+                salida.write(u"La dependencia " + nombre.encode('utf8').strip() + " no pertenece a la jurisdiccion informada: " + str(jurisdiccion) + "\n")
     salida.close()
 
 main()
