@@ -28,6 +28,7 @@ def main():
         tab = devolverSolapa(archivo,x)
         jurisdiccion = tab['C1'].value
         for y in range(tab.max_row):
+            print tab['B'+str(y)]
             cur.execute(orden.format(tab['B'+str(y)].value,jurisdiccion))
             res = cur.fetchall()
             if( len(res) == 0):
