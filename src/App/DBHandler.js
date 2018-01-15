@@ -60,6 +60,20 @@ export default class DBHandler{
             end_date:datos.hasta},true);*/
     }
 
+    actualizar_presencia(fun,datos){
+        let dic = {old_check_in:datos.original[0],
+        old_check_out:datos.original[1],
+        check_in:datos.registro[0],
+        check_out:datos.registro[1]};
+        this.enviarPeticion(fun,'api/0.1/attendance/'+ datos.legajo + '/update','POST',dic,true);
+    }
+
+    borrar_presencia(fun,datos){
+        let dic = {check_in:datos.original[0],
+        check_out:datos.original[1]};
+        this.enviarPeticion(fun,'api/0.1/attendance/'+ datos.legajo + '/delete','POST',dic,true);
+    }
+
     pedir_horas_extras_empleado(fun,datos){
         this.enviarPeticion(fun,'api/0.1/overtime/employee/'+datos.legajo,'POST',{
             initial_date:datos.desde,
