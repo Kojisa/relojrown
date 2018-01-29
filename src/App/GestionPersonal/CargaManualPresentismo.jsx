@@ -56,7 +56,18 @@ class Contenedor extends Component{
     }
 
     enviarHorario(){
+        let datos={
+            check_in:this.state.diaEntrada + ' ' + this.state.horaEntrada,
+            check_out:this.state.diaSalida + ' ' + this.state.horaSalida,
+        }
 
+
+
+        this.db.enviarPeticion(()=>{this.setState({diaEntrada : '',
+        diaSalida : '',
+        horaEntrada : '',
+        horaSalida : '',})},'api/0.1/attendance/' + this.state.legajo +'/add','POST',
+        datos,true,true)
     }
 
 

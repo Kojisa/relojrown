@@ -54,6 +54,7 @@ class Contenedor extends Component{
     }
 
     calcularFecha(indice){
+        console.log(indice)
         let dia = new Date().getDate();
         let mes = new Date().getMonth() + 1;
         let anio = new Date().getFullYear();
@@ -61,8 +62,8 @@ class Contenedor extends Component{
         let meses31=['01','03','05','07','08','10','12']
         let meses30=['04','06','09','11'];
         mes -= indice;
-        if (mes === 0){
-            mes = 12;
+        if (mes <= 0){
+            mes += 12;
             anio -= 1;
         }
         mes = mes.toString()
@@ -91,8 +92,8 @@ class Contenedor extends Component{
     obtenerMes(indice){
         let mes = new Date().getMonth() + 1;
         mes -= indice;
-        if (mes === 0){
-            mes = 12;
+        if (mes <= 0){
+            mes += 12;
         }
         return this.state.meses[mes];
     }
@@ -106,8 +107,8 @@ class Contenedor extends Component{
         let terminar = false;
         let mes = new Date().getMonth() - indice; //para revisar el proximo mes a calcular;
         let anio = new Date().getFullYear();
-        if (mes === 0){
-            mes = 12;
+        if (mes <= 0){
+            mes += 12;
             anio -= 1;
         }
         if(mes < 11 && anio <= 2017){

@@ -44,6 +44,7 @@ class Contenedor extends Component{
 
         this.borrarRegistro = this.borrarRegistro.bind(this);
         this.mandarRegistros = this.mandarRegistros.bind(this);
+        this.recibirRegistros = this.recibirRegistros.bind(this);
     }
 
     actualizar(evento){
@@ -58,31 +59,85 @@ class Contenedor extends Component{
     //tipo 0 es entrada tipo 1 es salida
     actualizarRegistro(pos,info,tipo){
         let registros = this.state.registros;
-        registros[pos][tipo] = info.dia + 'T' + info.hora;
+        registros[pos][tipo] = {dia:info.dia,hora:info.hora};
         this.setState({
             registros:registros
         });
 
-    } 
+    }
+
+    recibirRegistros(datos){
+
+        let presencias = [];
+        let originales =[];
+        
+        for (let x = 0; x < datos.attendance.length; x++){
+            presencias.push([
+                {
+                    dia:datos.attendance[x][0].split('T')[0],
+                    hora:datos.attendance[x][0].split('T')[1]
+                }
+                ,
+                {
+                    dia:datos.attendance[x][1].split('T')[0],
+                    hora:datos.attendance[x][1].split('T')[1]
+                }
+            ])
+            originales.push([
+                datos.attendance[x][0].replace('T',' '),
+                datos.attendance[x][1].replace('T',' ')
+            ])
+        }
+        
+
+        this.setState({
+            registros:presencias,
+            originales:originales,
+        });
+        
+
+    }
 
     obtenerNombre(){
         this.db.pedir_nombre((datos)=>(this.setState({nombre:datos.name})),this.state.legajo);
     }
 
     pedirRegistros(){
-        this.db.enviarPeticion((datos)=>(this.setState({
-            registros:datos.attendance,
-            originales:datos.attendance,
+        this.db.enviarPeticion(this.recibirRegistros
+        ,'api/0.1/attendance/'+this.state.legajo,'POST',{from_date:this.state.desde,to_date:this.state.hasta},true);
+    }
+
+    prepararFechasEnvio(parRegistro){
+        let lista =[];
+        let horaEntrada = parRegistro[0].hora;
+        if( horaEntrada.length < 7){
+            horaEntrada += ':00';
         }
-            )),'api/0.1/attendance/'+this.state.legajo,'POST',{from_date:this.state.desde,to_date:this.state.hasta},true);
+        let horaSalida = parRegistro[1].hora;
+        if(horaSalida.length < 7){
+            horaSalida += ':00';
+        }
+        lista.push(
+            parRegistro[0].dia + ' ' + horaEntrada
+        )
+        lista.push(
+            parRegistro[1].dia + ' ' + horaSalida
+        )
+        console.log(lista);
+        return lista;
     }
 
     borrarRegistro(pos){
-        this.db.borrar_presencia(this.pedirRegistros,{original:this.state.originales[pos],legajo:this.state.legajo})
+        this.db.borrar_presencia(
+        this.pedirRegistros,{original:this.state.originales[pos],legajo:this.state.legajo})
     }
 
     mandarRegistros(pos){
-        this.db.actualizar_presencia(null,{original:this.state.originales[pos],registro:this.state.registros[pos],legajo:this.state.legajo})
+        this.db.actualizar_presencia(
+            this.pedirRegistros
+        ,{original:this.state.originales[pos],
+            registro:this.prepararFechasEnvio(this.state.registros[pos])
+            ,legajo:this.state.legajo})
     }
 
     render(){
@@ -237,8 +292,8 @@ class Registro extends Component{
     constructor(props){
         super(props);
         this.state={
-            hora:props.fecha.split('T')[1],
-            dia:props.fecha.split('T')[0],
+            hora:props.fecha.hora,
+            dia:props.fecha.dia,
             indice:props.indice,
             tipo:props.entrada, //esto es un int, si es 0 fue marcado como entrada, si es 1, fue marcado como salida.
         }
@@ -248,10 +303,10 @@ class Registro extends Component{
 
     componentWillReceiveProps(props){
         this.setState({
-            hora:props.fecha.split('T')[1],
-            dia:props.fecha.split('T')[0],
+            hora:props.fecha.hora,
+            dia:props.fecha.dia,
             indice:props.indice,
-            tipo:props.entada,
+            tipo:props.entrada,
         })
     }
 
@@ -259,39 +314,28 @@ class Registro extends Component{
         let datos={
             hora:this.state.hora,
             dia:this.state.dia,
-            registro:this.state.registro,
-            tipo:this.state.entrada
         }
 
-        if(evento.target.name='dia'){
-            datos.dia =evento.target.value;
+        if(evento.target.name === 'dia'){
+            datos.dia = evento.target.value;
         }
-        if(evento.target.name='hora'){
+        else if(evento.target.name ==='hora'){
             datos.hora = evento.target.value;
         }
 
-        
         this.actualizar(this.state.indice,datos,this.state.tipo);
 
     }
 
     render(){
 
-        let boton = <RaisedButton label='Entrada' primary={true} 
-        onChange={()=>(this.actualizarRegistro({target:{name:'entrada',value:true}}))} />
-        if(!this.state.tipo == 0){
-            boton = <RaisedButton label='Salida' secondary={true} 
-            onChange={()=>(this.actualizarRegistro({target:{name:'entrada',value:false}}))} />
-        }
-
-
         return(
             <div>
                 <TextField floatingLabelText={ <label htmlFor="">Día</label> } value={this.state.dia} 
-                onChange={this.actualizarRegistro} name='dia' type='date' style={{width:'140px'}} />
+                onChange={this.actualizarRegistro} name='dia' type='date' style={{width:'140px'}} step={1}/>
                 
                 <TextField floatingLabelText={ <label htmlFor="">Hora</label> } value={this.state.hora}
-                onChange={this.actualizarRegistro} name='hora' type='time' style={{width:'80px'}}/>
+                onChange={this.actualizarRegistro} name='hora' type='time' style={{width:'120px'}} step={1}/>
             </div>
         )
     }

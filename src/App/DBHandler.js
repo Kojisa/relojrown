@@ -52,6 +52,7 @@ export default class DBHandler{
     }
 
     pedir_horas_extras(fun,datos){
+        console.log(datos);
         this.enviarPeticion(fun,'api/0.1/overtime/jurisdiction','POST',{
             initial_date:datos.desde,
             end_date:datos.hasta},true);
@@ -69,8 +70,9 @@ export default class DBHandler{
     }
 
     borrar_presencia(fun,datos){
-        let dic = {check_in:datos.original[0],
-        check_out:datos.original[1]};
+        let dic = {check_in:datos.original[0].replace('T',' '),
+        check_out:datos.original[1].replace('T',' ')};
+        console.log(dic);
         this.enviarPeticion(fun,'api/0.1/attendance/'+ datos.legajo + '/delete','POST',dic,true);
     }
 
