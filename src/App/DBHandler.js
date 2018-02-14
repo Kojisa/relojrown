@@ -2,7 +2,7 @@ export default class DBHandler{
     
     PORT = ":8000";// ":8000";
     HOST = "172.20.0.3";
-
+    HOSTRAFAM = '172.22.20.241';
     RUTABASICA = 'api/0.1/'
 
     actualizar_limite(fun,datos,tipo){
@@ -185,7 +185,14 @@ export default class DBHandler{
                 console.log(this.responseText);
             }
         };
-        request.open(metodo,"http://"+this.HOST+this.PORT+"/"+url,asinc);
+
+        let host = this.HOST;
+        if (window.location.href.indexOf(this.HOST) < 0){
+            host = this.HOSTRAFAM;
+        }
+
+
+        request.open(metodo,"http://"+host+this.PORT+"/"+url,asinc);
         var datosFinales = {};
         if(credenciales){
             request.setRequestHeader('auth_token',document.cookie.split(';')[0].substring(11));
