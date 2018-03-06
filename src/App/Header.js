@@ -18,6 +18,7 @@ import Planillones from './GestionPersonal/Planillones';
 import VerPresentes from './Inasistencias/VerPresentes';
 import AsistenciaPorLegajo from './Inasistencias/AsistenciaPorLegajo';
 import HorasExtras from './Dependencias/HorasExtras';
+import informes from './Informes/PrincipalInformes';
 import Home from './Home/HomeCuentas';
     
     class Nav extends React.Component{
@@ -65,6 +66,8 @@ import Home from './Home/HomeCuentas';
                 'funcion':AsistenciaPorLegajo},
                 {'nombre':'Horas Extras',
                 'funcion':HorasExtras},
+                {'nombre':'Informes',
+                'funcion':informes},
                 
 
                 

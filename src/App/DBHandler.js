@@ -139,8 +139,18 @@ export default class DBHandler{
         this.enviarPeticion(fun,'api/0.1/budget/dependencies/'+anio+'/'+mes,'GET',null,true);
     }
 
+    pedir_gasto_dependencia(fun,dependencia,inicio,final){
+        this.enviarPeticion(fun,'api/0.1/overtime/dependencies/' + dependencia,'POST',
+        {initial_date:inicio,end_date:final},true,true);
+    }
+
+    pedir_gasto_secretaria(fun,secretaria,inicio,final){
+        this.enviarPeticion(fun,'api/0.1/overtime/jurisdiction/' + secretaria,'POST',
+        {initial_date:inicio,end_date:final},true,true);
+    }
+
     pedir_dependencias(fun){
-        this.enviarPeticion(fun,'api/0.1/budget/dep_status/'+2017+'/'+9,'GET');
+        this.enviarPeticion(fun,'api/0.1/dependencies/all','GET');
     }
 
     bloquear_dependencia(fun,codigo){

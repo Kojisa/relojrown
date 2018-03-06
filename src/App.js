@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Header from './App/Header.js';
+import Informes from './App/Informes/PrincipalInformes';
 
 
 

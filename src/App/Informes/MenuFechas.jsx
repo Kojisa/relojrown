@@ -1,31 +1,32 @@
 import React,{Component} from 'react';
 import ReactDOM from 'react-dom';
-import {TextField,Paper,RaisedButton,SelectField,MenuItem} from 'material-ui';
+import {TextField,Paper,RaisedButton,SelectField,MenuItem,Checkbox} from 'material-ui';
 import MUICont from 'material-ui/styles/MuiThemeProvider';
 import DBHandler from '../DBHandler.js';
 
 
 
-export class Fechas extends Component{
+ export default class Fechas extends Component{
     constructor(props){
         super(props);
         this.state={
             mes:'',
             anio:'',
             periodo:'',
+            actualizoPadre:false,
             meses:[
-                <MenuItem value={'01'} primaryText='Enero' />,
-                <MenuItem value={'02'} primaryText='Febrero'/>,
-                <MenuItem value={'03'} primaryText='Marzo'/>,
-                <MenuItem value={'04'} primaryText='Abril'/>,
-                <MenuItem value={'05'} primaryText='Mayo'/>,
-                <MenuItem value={'06'} primaryText='Junio'/>,
-                <MenuItem value={'07'} primaryText='Julio'/>,
-                <MenuItem value={'08'} primaryText='Agosto'/>,
-                <MenuItem value={'09'} primaryText='Septiembre'/>,
-                <MenuItem value={'10'} primaryText='Octubre'/>,
-                <MenuItem value={'11'} primaryText='Noviembre'/>,
-                <MenuItem value={'12'} primaryText='Diciembre'/>,
+                <MenuItem value={'01'} primaryText='Enero'  key={1}/>,
+                <MenuItem value={'02'} primaryText='Febrero' key={2}/>,
+                <MenuItem value={'03'} primaryText='Marzo' key={3}/>,
+                <MenuItem value={'04'} primaryText='Abril' key={4}/>,
+                <MenuItem value={'05'} primaryText='Mayo' key={5}/>,
+                <MenuItem value={'06'} primaryText='Junio' key={6}/>,
+                <MenuItem value={'07'} primaryText='Julio' key={7}/>,
+                <MenuItem value={'08'} primaryText='Agosto' key={8}/>,
+                <MenuItem value={'09'} primaryText='Septiembre' key={9}/>,
+                <MenuItem value={'10'} primaryText='Octubre' key={10}/>,
+                <MenuItem value={'11'} primaryText='Noviembre' key={11}/>,
+                <MenuItem value={'12'} primaryText='Diciembre' key={12}/>,
             ],
             inicio:'',
             fin:'',
@@ -33,6 +34,7 @@ export class Fechas extends Component{
 
         this.actualizarInicio = props.funActInicio;
         this.actualizarFin = props.funActFin;
+        this.crearFechas = this.crearFechas.bind(this);
     }
 
     generarAnios(){
@@ -40,7 +42,7 @@ export class Fechas extends Component{
         let final = new Date().getFullYear();
         let actual = inicial;
         let lista = [];
-        while (actual > final){
+        while (actual <= final){
             lista.push( <MenuItem value={actual.toString()} primaryText={actual.toString()}/>)
             actual += 1;
         }
@@ -67,10 +69,17 @@ export class Fechas extends Component{
             diaFinal = '28'
         }
         
-        let desde = this.state.anio + '-' + this.state.mes + '-' + '01';
-        let hasta = this.state.anio + '-' + this.state.mes + '-' + diaFinal;
+        let desde = "" + this.state.anio + '-' + this.state.mes + '-' + '01';
+        let hasta = "" + this.state.anio + '-' + this.state.mes + '-' + diaFinal;
         this.actualizarInicio(desde);
         this.actualizarFin(hasta);
+        this.setState({actualizoPadre:true})
+    }
+
+    componentDidUpdate(){
+        if(this.state.mes != '' && this.state.anio != '' && this.state.periodo == true && this.state.actualizoPadre == false){
+            this.crearFechas();
+        }
     }
 
 
@@ -83,7 +92,7 @@ export class Fechas extends Component{
                     name='inicio' type='date' floatingLabelFixed={true} ></TextField>
 
                     <TextField value={this.state.fin} floatingLabelText={ <label htmlFor="">Hasta</label> }
-                    onChange={(ev)=>{this.setState({fin:ev.target.value}),
+                    onChange={(ev)=>{this.setState({fin:ev.target.value});
                     this.actualizarFin(ev.target.value)}} 
                     
                     name='fin' type='date' floatingLabelFixed={true}></TextField>
@@ -95,7 +104,7 @@ export class Fechas extends Component{
                             value={this.state.mes}
                             floatingLabelText="Mes"
                             floatingLabelFixed={true}
-                            onChange={(e, i, value) => {this.setState({ mes:value })}
+                            onChange={(e, i, value) => {this.setState({ mes:value,actualizoPadre:false })}
                             }>
                             {this.state.meses}
                         </SelectField>
@@ -103,7 +112,7 @@ export class Fechas extends Component{
                             value={this.state.anio}
                             floatingLabelText="Año"
                             floatingLabelFixed={true}
-                            onChange={(e, i, value) => {this.setState({ anio:value })}
+                            onChange={(e, i, value) => {this.setState({ anio:value,actualizoPadre:false})}
                             }>
                             {this.generarAnios()}
                         </SelectField>
@@ -111,9 +120,10 @@ export class Fechas extends Component{
         }
 
         return(
-            <div>
+            <div style={{display:'inline-block'}}>
                 <div style={{marginLeft:'5px'}}>
                     <Checkbox
+                        labelPosition='left'
                         checked={this.state.periodo}
                         label="Consultar por Periodo: "
                         onCheck={(e, checked) => this.setState({ periodo:checked })}/>

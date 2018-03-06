@@ -1,9 +1,10 @@
 import React,{Component} from 'react';
 import ReactDOM from 'react-dom';
-import {TextField,Paper,RaisedButton,SelectField,MenuItem} from 'material-ui';
+import {TextField,Paper,RaisedButton,SelectField,MenuItem,Checkbox} from 'material-ui';
 import MUICont from 'material-ui/styles/MuiThemeProvider';
 import DBHandler from '../DBHandler.js';
-import Fechas from 'MenuFechas';
+import Fechas from './MenuFechas';
+import Totales from './GastosTotales';
 
 //funciones a importar para cada seccion
 
@@ -68,7 +69,7 @@ class Contenedor extends Component{
 
     render(){
 
-        let fechas = <div>
+        /*let fechas = <div>
                     <TextField value={this.state.inicio} floatingLabelText={ <label htmlFor="">Desde</label> } 
                     onChange={(ev)=>{this.setState({inicio:ev.target.value})}} name='inicio' type='date' floatingLabelFixed={true} ></TextField>
                     <TextField value={this.state.fin} floatingLabelText={ <label htmlFor="">Hasta</label> }
@@ -91,7 +92,7 @@ class Contenedor extends Component{
                             {this.generarAnios()}
                         </SelectField>
                     </div>
-        }
+        }*/
 
         return(
             <div>
@@ -102,14 +103,19 @@ class Contenedor extends Component{
                         floatingLabelFixed={true}
                         onChange={(e, i, value) => this.setState({ tipo:value })}>
                     </SelectField>
-                    <Checkbox
-                        checked={this.state.periodo}
-                        label="Consultar por Periodo: "
-                        onCheck={(e, checked) => this.setState({ periodo:checked })}/>
                     <br/>
-                    {fechas}
+                    <Fechas funActInicio={(valor)=>this.setState({inicio:valor})}
+                    funActFin={(valor)=>this.setState({fin:valor})} />
+                    <RaisedButton
+                    primary={true}
+                    style={{display:'inline-block',marginLeft:'10px'}}
+                    label="Buscar"
+                    onTouchTap={()=>{
+                        console.log(this.state.inicio);
+                        console.log(this.state.fin);
+                    }} />
                 </div>
-
+                <Totales/>
             </div>
         )
     }

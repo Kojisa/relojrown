@@ -41,6 +41,7 @@ class Contenedor extends Component{
 
     sumarValores(datos){
         let dic = {};
+        console.log(datos);
         for (let x = 0; x < datos.length; x++){
             if(!(datos[x].hour_type in dic)){
                 dic[datos[x].hour_type] = 0;
@@ -54,7 +55,6 @@ class Contenedor extends Component{
     }
 
     calcularFecha(indice){
-        console.log(indice)
         let dia = new Date().getDate();
         let mes = new Date().getMonth() + 1;
         let anio = new Date().getFullYear();
