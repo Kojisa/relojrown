@@ -94,7 +94,7 @@ class Contenedor extends Component{
     }
 
     generarOpciones(){
-        let lista = ['Total','Secretaria','Dependencia','Agente'];
+        let lista = ['Total','Secretaria','Dependencia'];
         return lista.map((elem,index)=> <MenuItem primaryText={elem} key={index} value={index} />)
     }
 
