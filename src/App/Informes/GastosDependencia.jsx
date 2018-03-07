@@ -148,7 +148,7 @@ export default class InformeGlobal extends Component{
                             <br/>
                             <span> <b> Total de Horas Extras generadas:</b> {horasExtras}</span>
                             <br/>
-                            <span> <b>Total de que registrados: </b> {this.state.cantEmpleados}</span>
+                            <span> <b>Total de Agentes que registraron Horas Extras: </b> {this.state.cantEmpleados}</span>
                             <div>
                                 <div style={{display:'inline-block'}}>
                                     <span>
