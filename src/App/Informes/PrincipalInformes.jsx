@@ -5,6 +5,8 @@ import MUICont from 'material-ui/styles/MuiThemeProvider';
 import DBHandler from '../DBHandler.js';
 import Fechas from './MenuFechas';
 import Totales from './GastosTotales';
+import GastosJurisdiccion from './GastosJurisdiccion';
+import GastosDependencias from './GastosDependencia';
 
 //funciones a importar para cada seccion
 
@@ -33,7 +35,7 @@ class Contenedor extends Component{
             periodo:true,
             inicio:'',
             fin:'',
-            tipo:0,
+            tipo:-1,
             funciones:[],//aca van a ir todos los objetos.
             mes:'',
             anio:'',
@@ -51,7 +53,31 @@ class Contenedor extends Component{
                 <MenuItem value={'11'} primaryText='Noviembre'/>,
                 <MenuItem value={'12'} primaryText='Diciembre'/>,
             ],
+            secretarias:{},
+            dependencias:{},
+            secretaria:'',
+            dependencia:'',
         }
+        this.db = new DBHandler();
+        this.db.pedir_limite_secretarias((datos)=>{
+            let secretarias = []
+            for (let x = 0; x < datos.budgets.length; x ++) {
+                secretarias.push([datos.budgets[x][0],datos.budgets[x][1]]);
+            }
+            secretarias.sort((a,b)=> a[1].localeCompare(b[1]))
+            this.setState({secretarias:secretarias})
+        })
+        this.db.pedir_dependencias((datos)=>{
+            let ref = [];
+            datos.dependencies.map((elem,index)=>{
+                ref.push([elem[0],elem[1]]);
+            });
+            datos['sub-dependencies'].map((elem,index)=>{
+                ref.push([elem[0],elem[1]]);
+            });
+            ref.sort((a,b)=> a[1].localeCompare(b[1]))
+            this.setState({dependencias:ref})
+        })
     }
 
     generarAnios(){
@@ -67,32 +93,38 @@ class Contenedor extends Component{
 
     }
 
-    render(){
+    generarOpciones(){
+        let lista = ['Total','Secretaria','Dependencia','Agente'];
+        return lista.map((elem,index)=> <MenuItem primaryText={elem} key={index} value={index} />)
+    }
 
-        /*let fechas = <div>
-                    <TextField value={this.state.inicio} floatingLabelText={ <label htmlFor="">Desde</label> } 
-                    onChange={(ev)=>{this.setState({inicio:ev.target.value})}} name='inicio' type='date' floatingLabelFixed={true} ></TextField>
-                    <TextField value={this.state.fin} floatingLabelText={ <label htmlFor="">Hasta</label> }
-                    onChange={(ev)=>{this.setState({fin:ev.target.value})}} name='fin' type='date' floatingLabelFixed={true}></TextField>
-                </div>
-        if(this.state.periodo){
-            fechas = <div>
-                        <SelectField
-                            value={this.state.mes}
-                            floatingLabelText="Mes"
-                            floatingLabelFixed={true}
-                            onChange={(e, i, value) => this.setState({ mes:value })}>
-                            {this.state.meses}
+    render(){
+        let informe = null;
+        let segundoSelector = null;
+        if(this.state.tipo === 0){
+            informe = <Totales inicio={this.state.inicio} fin={this.state.fin} />
+        }
+        else if(this.state.tipo === 1){
+            informe = <GastosJurisdiccion secretaria={this.state.secretaria} inicio={this.state.inicio} fin={this.state.fin} />
+            segundoSelector =  <SelectField 
+                                value={this.state.secretaria}
+                                floatingLabelText="Secretaria"
+                                floatingLabelFixed={true}
+                                onChange={(e, i, value) => this.setState({ secretaria:value })}>
+                                {this.state.secretarias.map((elem,index)=><MenuItem value={elem[0]} primaryText={elem[1]} key={index} />)}
+            </SelectField>
+        }
+
+        else if( this.state.tipo === 2){
+            informe = <GastosDependencias dependencia={this.state.dependencia} inicio={this.state.inicio} fin={this.state.fin}/>
+            segundoSelector= <SelectField 
+                                    value={this.state.dependencia}
+                                    floatingLabelText="Dependencia"
+                                    floatingLabelFixed={true}
+                                    onChange={(e, i, value) => this.setState({ dependencia:value })}>
+                                    {this.state.dependencias.map((elem,index)=><MenuItem value={elem[0]} primaryText={elem[1]} key={index} />)}
                         </SelectField>
-                        <SelectField
-                            value={this.state.anio}
-                            floatingLabelText="Año"
-                            floatingLabelFixed={true}
-                            onChange={(e, i, value) => this.setState({ anio:value })}>
-                            {this.generarAnios()}
-                        </SelectField>
-                    </div>
-        }*/
+        }
 
         return(
             <div>
@@ -102,7 +134,9 @@ class Contenedor extends Component{
                         floatingLabelText="Tipo de informe"
                         floatingLabelFixed={true}
                         onChange={(e, i, value) => this.setState({ tipo:value })}>
+                        {this.generarOpciones()}
                     </SelectField>
+                    {segundoSelector}
                     <br/>
                     <Fechas funActInicio={(valor)=>this.setState({inicio:valor})}
                     funActFin={(valor)=>this.setState({fin:valor})} />
@@ -115,7 +149,9 @@ class Contenedor extends Component{
                         console.log(this.state.fin);
                     }} />
                 </div>
-                <Totales/>
+                <div style={{marginTop:'10px'}}>
+                    {informe}
+                </div>
             </div>
         )
     }

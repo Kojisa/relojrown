@@ -1,14 +1,12 @@
 import React,{Component} from 'react';
 import ReactDOM from 'react-dom';
 import MUICont from 'material-ui/styles/MuiThemeProvider';
-import {TextField,Paper,RaisedButton,List,ListItem,Tab,Tabs,
+import {TextField,Paper,RaisedButton,List,ListItem,Tab,Tabs,SelectField,MenuItem,
     TableRow,TableBody,TableRowColumn,Table,TableHeader,TableHeaderColumn} from 'material-ui';
 import DBHandler from '../DBHandler.js';
 import {BarChart,Bar,XAxis,YAxis,Legend,Tooltip,CartesianGrid,
 PieChart,Pie,Cell} from 'recharts';
 
-
-const RADIAN = Math.PI / 180;
 
 
 export default class InformeGlobal extends Component{
@@ -17,6 +15,7 @@ export default class InformeGlobal extends Component{
         this.state = {
             consumos:{},
             dependencias:[],
+            secretaria:props.secretaria,
             inicio:props.inicio,
             fin:props.fin,
             total:[
@@ -31,8 +30,8 @@ export default class InformeGlobal extends Component{
         }
         this.db = new DBHandler();
         this.pedirDatos = this.pedirDatos.bind(this);
-        if(props.inicio && props.fin && props.inicio.length > 0 && props.fin.length > 0){
-            this.pedirDatos();
+        if(props.inicio && props.fin && props.inicio.length > 0 && props.fin.length > 0 && props.secretaria != ''){
+            this.pedirDatos(props.inicio.props.fin,props.secretaria);
         }   
        
     }
@@ -42,6 +41,7 @@ export default class InformeGlobal extends Component{
             consumos:{},
             dependencias:[],
             inicio:props.inicio,
+            secretaria:props.secretaria,
             fin:props.fin,
             total:[
                 {nombre:'100%',cantHoras:0,gasto:0},
@@ -52,51 +52,58 @@ export default class InformeGlobal extends Component{
             dependencias:{},
             cantEmpleados:0,
         })
-        if(props.inicio && props.fin && props.inicio.length > 0 && props.fin.length > 0){
-            this.pedirDatos(props.inicio,props.fin);
+        if(props.inicio && props.fin && props.inicio.length > 0 && props.fin.length > 0 && props.secretaria != ''){
+            this.pedirDatos(props.inicio,props.fin,props.secretaria);
         }  
     }
 
-    pedirDatos(inicio,fin){
-        this.db.pedir_horas_extras((datos)=>{
-            let info = datos.overtimes;
-            if(info.length == 0){
-                return;
-            }
-            let dic = [
-                {name:'100%',cantHoras:0,gasto:0},
-                {name:'50%',cantHoras:0,gasto:0},
-                {name:'50%N',cantHoras:0,gasto:0},
-                {name:'100%N',cantHoras:0,gasto:0}]
-            let secretarias = {};
-            let tipos = {'100%':0,'50%':1,'50%N':2,'100%N':3}
-            for (let x = 0; x < info.length; x++){
-                if(!(info[x][0] in secretarias )){
-                    secretarias[info[x].secretariat_id] = {gasto:0,cantHoras:0};
+    pedirDatos(inicio,fin,secretaria){
+        this.db.pedir_dependencias_jurisdiccion((depen)=>{
+            let ref = {};
+            depen.dependencies.map((elem,index)=>{
+                ref[elem[0]]= elem[1];
+            });
+            depen['sub-dependencies'].map((elem,index)=>{
+                ref[elem[0]] = elem[1];
+            });
+            this.db.pedir_horas_extras_dependencias((datos)=>{
+                let info = datos.overtimes;
+                if(info.length === 0){
+                    return;
                 }
-
-                let pos = tipos[info[x].hour_type];
-                secretarias[info[x].secretariat_id].gasto += info[x].result;
-                secretarias[info[x].secretariat_id].cantHoras += info[x].acumulated_hours;
-                dic[pos].gasto += info[x].result;
-                dic[pos].cantHoras += info[x].acumulated_hours;
-            }
-            for (let x = 0; x < dic.length; x++){
-                dic[x].gasto = Math.round(dic[x].gasto * 100) /100
-                dic[x].cantHoras = Math.round(dic[x].cantHoras * 100) /100
-                
-                secretarias[info[x].secretariat_id].gasto = Math.round(secretarias[info[x].secretariat_id].gasto * 100) /100
-                secretarias[info[x].secretariat_id].cantHoras = Math.round(secretarias[info[x].secretariat_id].cantHoras * 100) /100
-            }
-            console.log(secretarias);
-            this.setState({total:dic,consumos:secretarias })
-        },{desde:inicio,hasta:fin});
-
+                let dic = [
+                    {name:'100%',cantHoras:0,gasto:0},
+                    {name:'50%',cantHoras:0,gasto:0},
+                    {name:'50%N',cantHoras:0,gasto:0},
+                    {name:'100%N',cantHoras:0,gasto:0}
+                ];
+                let gastos = {};
+                let tipos = {'100%':0,'50%':1,'50%N':2,'100%N':3}
+                for (let x = 0; x < info.length; x++){
+                    
+                    if(info[x].dependence_id in ref){
+                        if(!(info[x].dependence_id in gastos)){
+                            
+                            gastos[info[x].dependence_id] = {gasto:0,cantHoras:0}
+                        }
+                        gastos[info[x].dependence_id].gasto = Math.round(info[x].result * 100) /100;
+                        gastos[info[x].dependence_id].cantHoras = Math.round(info[x].acumulated_hours * 100) /100;
+                        let pos = tipos[info[x].hour_type];
+                        dic[pos].gasto += Math.round(info[x].result * 100) /100;
+                        dic[pos].cantHoras += Math.round(info[x].acumulated_hours * 100) /100;
+                    }
+                    
+                }
+                console.log(gastos);
+                this.setState({consumos:gastos,dependencias:ref,total:dic})
+    
+            },{desde:inicio,hasta:fin})
+        },secretaria)
 
         this.db.pedir_horas_extras_empleados((datos)=>{
             let empleados = {};
             for (let x = 0; x < datos.overtimes.length; x++){
-                if(!(datos.overtimes[x].docket in empleados)){
+                if(!(datos.overtimes[x].docket in empleados) && datos.overtimes[x].dependence in this.state.dependencias){
                     empleados[datos.overtimes[x].docket] = 1;
                 }
             }
@@ -104,61 +111,21 @@ export default class InformeGlobal extends Component{
 
         },inicio,fin);
 
-
-        this.db.pedir_limite_secretarias((datos)=>{
-            let secretarias = {}
-            for (let x = 0; x < datos.budgets.length; x ++) {
-                secretarias[datos.budgets[x][0]] = datos.budgets[x][1];
-            }
-            this.setState({secretarias:secretarias})
-        })
-
-        this.db.pedir_dependencias((datos)=>{
-            let ref = {};
-            datos.dependencies.map((elem,index)=>{
-                ref[elem[0]]= elem[1];
-            });
-            datos['sub-dependencies'].map((elem,index)=>{
-                ref[elem[0]] = elem[1];
-            });
-            this.setState({dependencias:ref})
-        })
     }
 
     render(){
-
-        
-
-        let texto = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
-            const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-         const x  = cx + radius * Math.cos(-midAngle * RADIAN);
-         const y = cy  + radius * Math.sin(-midAngle * RADIAN);
-        
-         return (
-           <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} 	dominantBaseline="central">
-               {`${(percent * 100).toFixed(0)}%`}
-           </text>
-         );
-       };
-
-
-
-
         let colores = ['#29B6F6','#EF5350','#AB47BC','#66BB6A']
         let grafico1 = <PieChart width={600} height={350} >
-                            <Tooltip/>
                             <Legend verticalAlign="top" height={36}/>
                             <Pie data={this.state.total} dataKey='gasto' 
-                             label={texto} outerRadius={95}>
+                             label outerRadius={85}>
                              {this.state.total.map((entry,index)=> <Cell fill={[colores[index]]}/>)}
                             </Pie>
                         </PieChart>
         let grafico2 = <PieChart width={600} height={350} >
-        
-                            <Tooltip/>
                             <Legend verticalAlign="top" height={36}/>
                             <Pie data={this.state.total} dataKey='cantHoras' 
-                            outerRadius={85} label={texto}>
+                            outerRadius={85} >
                                 {this.state.total.map((entry,index)=> <Cell fill={[colores[index]]}/>)}
                             </Pie>
                         </PieChart>
@@ -191,10 +158,10 @@ export default class InformeGlobal extends Component{
                             </div>
                             <div>
                                 <div style={{display:'inline-block'}}>
-                                    <TopGastadores gastos={this.state.consumos} secretarias={this.state.secretarias}/>
+                                    <TopGastadores gastos={this.state.consumos} secretarias={this.state.dependencias}/>
                                 </div>
                                 <div style={{display:'inline-block'}}>
-                                    <TopHoras horas={this.state.consumos} secretarias={this.state.secretarias} />
+                                    <TopHoras horas={this.state.consumos} secretarias={this.state.dependencias} />
                                 </div>
                             </div>
                         </div>
@@ -267,7 +234,7 @@ class TopGastadores extends Component{
                             <Table height={300} fixedHeader={true} selectable={false} >
                                 <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
                                     <TableRow>
-                                        <TableHeaderColumn style={{width:'350px'}}>Secretaria</TableHeaderColumn>
+                                        <TableHeaderColumn style={{width:'350px'}}>Dependencia</TableHeaderColumn>
                                         <TableHeaderColumn>Gasto ($)</TableHeaderColumn>
                                     </TableRow>
                                 </TableHeader>
@@ -342,7 +309,7 @@ class TopHoras extends Component{
                             <Table height={300} fixedHeader={true} selectable={false} >
                                 <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
                                     <TableRow>
-                                        <TableHeaderColumn style={{width:'350px'}}>Secretaria</TableHeaderColumn>
+                                        <TableHeaderColumn style={{width:'350px'}}>Dependencia</TableHeaderColumn>
                                         <TableHeaderColumn>Horas Extras</TableHeaderColumn>
                                     </TableRow>
                                 </TableHeader>

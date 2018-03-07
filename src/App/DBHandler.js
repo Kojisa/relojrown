@@ -40,6 +40,17 @@ export default class DBHandler{
         }
     }
 
+    pedir_horas_extras_empleados(fun,inicio,fin){
+        console.log('entra')
+        this.enviarPeticion(fun,'api/0.1/overtime/list/dependencies','POST',{initial_date:inicio,end_date:fin},true);
+    }
+
+    pedir_horas_extras_dependencias(fun,datos){
+        this.enviarPeticion(fun,'api/0.1/overtime/dependencies','POST',{
+            initial_date:datos.desde,
+            end_date:datos.hasta},true);
+    }
+
     pedir_dependencias_jurisdiccion(fun,juri){
         this.enviarPeticion(fun,'api/0.1/dependencies/'+juri,'GET',null,false)
     }
