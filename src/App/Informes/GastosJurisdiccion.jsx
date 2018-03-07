@@ -201,7 +201,11 @@ class TopGastadores extends Component{
         let secre = this.state.secretarias;
         listado.sort((a,b)=>{return b.gasto - a.gasto})
         let lista = []
-        for (let x = 0; x < 10; x++){
+        let maximo = 10;
+        if (listado.length < maximo){
+            maximo = listado.length;
+        }
+        for (let x = 0; x < maximo; x++){
             lista.push( <TableRow>
                 <TableRowColumn style={{width:'350px'}}>
                     {secre[listado[x].secre]}
@@ -277,7 +281,11 @@ class TopHoras extends Component{
         let secre = this.state.secretarias;
         listado.sort((a,b)=>{return b.cantHoras - a.cantHoras})
         let lista = []
-        for (let x = 0; x < 10; x++){
+        let maximo = 10;
+        if (listado.length < maximo){
+            maximo = listado.length;
+        }
+        for (let x = 0; x < maximo; x++){
             lista.push( <TableRow>
                 <TableRowColumn style={{width:'350px'}}>
                     {secre[listado[x].secre]}
