@@ -140,14 +140,6 @@ class Contenedor extends Component{
                     <br/>
                     <Fechas funActInicio={(valor)=>this.setState({inicio:valor})}
                     funActFin={(valor)=>this.setState({fin:valor})} />
-                    <RaisedButton
-                    primary={true}
-                    style={{display:'inline-block',marginLeft:'10px'}}
-                    label="Buscar"
-                    onTouchTap={()=>{
-                        console.log(this.state.inicio);
-                        console.log(this.state.fin);
-                    }} />
                 </div>
                 <div style={{marginTop:'10px'}}>
                     {informe}
