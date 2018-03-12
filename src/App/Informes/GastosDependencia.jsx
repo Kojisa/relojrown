@@ -100,23 +100,21 @@ export default class InformeGlobal extends Component{
                     }
                     
                 }
-                console.log(gastos)
-                console.log(ref);
-                this.setState({consumos:gastos,dependencias:ref,total:dic})
-    
+                this.db.pedir_horas_extras_empleados((datos)=>{
+                    let empleados = {};
+                    for (let x = 0; x < datos.overtimes.length; x++){
+                        if(!(datos.overtimes[x].docket in empleados) && datos.overtimes[x].dependence in ref){
+                            empleados[datos.overtimes[x].docket] = 1;
+                        }
+                    }
+                    this.setState({cantEmpleados:Object.keys(empleados).length,
+                        consumos:gastos,dependencias:ref,total:dic});
+        
+                },inicio,fin);
             },{desde:inicio,hasta:fin})
         },dependencia)
 
-        this.db.pedir_horas_extras_empleados((datos)=>{
-            let empleados = {};
-            for (let x = 0; x < datos.overtimes.length; x++){
-                if(!(datos.overtimes[x].docket in empleados) && datos.overtimes[x].dependence in this.state.dependencias){
-                    empleados[datos.overtimes[x].docket] = 1;
-                }
-            }
-            this.setState({cantEmpleados:Object.keys(empleados).length});
-
-        },inicio,fin);
+        
 
     }
 

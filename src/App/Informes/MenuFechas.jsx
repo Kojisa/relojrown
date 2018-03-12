@@ -126,7 +126,12 @@ import DBHandler from '../DBHandler.js';
                         labelPosition='left'
                         checked={this.state.periodo}
                         label="Consultar por Periodo: "
-                        onCheck={(e, checked) => this.setState({ periodo:checked })}/>
+                        onCheck={(e, checked) => {
+                            this.setState({ periodo:checked,inicio:'',fin:'',mes:'',anio:'' });
+                            this.actualizarFin(''); 
+                            this.actualizarInicio('');
+                            }
+                        }/>
                     <br/>
                     {fechas}
                 </div>
