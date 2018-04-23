@@ -41,7 +41,6 @@ class Contenedor extends Component{
 
     sumarValores(datos){
         let dic = {};
-        console.log(datos);
         for (let x = 0; x < datos.length; x++){
             if(!(datos[x].hour_type in dic)){
                 dic[datos[x].hour_type] = 0;

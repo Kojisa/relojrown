@@ -20,6 +20,8 @@ import AsistenciaPorLegajo from './Inasistencias/AsistenciaPorLegajo';
 import HorasExtras from './Dependencias/HorasExtras';
 import informes from './Informes/PrincipalInformes';
 import Home from './Home/HomeCuentas';
+import Usuarios from './Usuarios';
+
     
     class Nav extends React.Component{
         lista = [ //futuro formato [nombre,icono,funcion]
@@ -68,6 +70,8 @@ import Home from './Home/HomeCuentas';
                 'funcion':HorasExtras},
                 {'nombre':'Informes',
                 'funcion':informes},
+                {'nombre':'Usuarios',
+                'funcion':Usuarios},
                 
 
                 
@@ -134,9 +138,10 @@ import Home from './Home/HomeCuentas';
                 pas:'',
                 onLogin:props.onLogin,
             }
-            this.enviar_login = this.enviar_login.bind(this)
-            this.cargar_usuario = this.cargar_usuario.bind(this)
-            this.actualizarDatos = this.actualizarDatos.bind(this)
+            this.enviar_login = this.enviar_login.bind(this);
+            this.cargar_usuario = this.cargar_usuario.bind(this);
+            this.actualizarDatos = this.actualizarDatos.bind(this);
+            this.funcionEnter = this.funcionEnter.bind(this);
         }
     
         enviar_login(){
@@ -146,11 +151,25 @@ import Home from './Home/HomeCuentas';
             if('error' in datos){
                 return;
             }
+            
+            let dic = {
+                a:'2',
+                b:'3',
+            }
             document.cookie = "auth_token="+datos["auth_token"];
             document.cookie =  'username='+this.state.us;
-            this.state.onLogin()
+            this.state.onLogin(this.state.us,datos['auth_token'])
         }
-    
+        
+        funcionEnter(ev){
+            if(ev.key==='Enter'){
+                if(this.state.us.length > 0 && this.state.pas.length > 0){
+                    this.enviar_login();
+                    ev.preventDefault();
+                }
+            }
+        }
+
         actualizarDatos(evento,texto){
             let campo = evento.target.name;
             this.setState({[campo]:texto});
@@ -162,9 +181,11 @@ import Home from './Home/HomeCuentas';
                 <div style={{width:'100%',height:'100%',backgroundColor:'rgba(255,255,255,0.4)'}}>   
                     <MUICont>
                         <Paper style={{width:'400dp',height:'300dp',marginLeft:'40%',marginRight:'60%'}} zDepth={1}>
-                            <TextField floatingLabelText={<label>Usuario</label>} name='us' onChange={this.actualizarDatos}/>
+                            <TextField floatingLabelText={<label>Usuario</label>} name='us' onChange={this.actualizarDatos}
+                            onKeyPress={this.funcionEnter}/>
                             <br/>
-                            <TextField floatingLabelText={<label>Contraseña</label>} name='pas' onChange={this.actualizarDatos} type='password'/>
+                            <TextField floatingLabelText={<label>Contraseña</label>} name='pas' onChange={this.actualizarDatos}
+                             type='password' onKeyPress={this.funcionEnter}/>
                             <br/>
                             <RaisedButton label='Ingresar' primary={true} onClick={this.enviar_login} style={{marginLeft:'50%'}}/>
                         </Paper>
@@ -186,6 +207,8 @@ import Home from './Home/HomeCuentas';
                 render:false,
                 loged:false,
                 estadoNav:false,
+                usuario:'',
+                token:'',
             }
             this.logueado = this.logueado.bind(this);
             this.cambiarEstadoNav = this.cambiarEstadoNav.bind(this);
@@ -202,17 +225,20 @@ import Home from './Home/HomeCuentas';
             this.setState((prev)=>({estadoNav:!this.state.estadoNav}))
         }
     
-        logueado(){
-            this.setState({loged:true,render:true});
+        logueado(us,token){
+            this.setState({loged:true,
+                render:true,
+                usuario:us,
+                token:token});
             //this.mainCont.limpiar = limpiarCont;
         }
     
-    
+        
     
         render(){
             
             if(this.state.loged === false){
-                return(<Login onLogin={this.logueado}/>)
+                return(<Login onLogin={this.logueado} />)
             }
     
             return (
@@ -228,6 +254,7 @@ import Home from './Home/HomeCuentas';
     
     
     }
+
     
     
     function limpiarCont(){

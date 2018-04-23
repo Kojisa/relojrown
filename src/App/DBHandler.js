@@ -1,3 +1,4 @@
+
 export default class DBHandler{
     
     PORT = ":8000";// ":8000";
@@ -40,8 +41,27 @@ export default class DBHandler{
         }
     }
 
+    pedir_datos_usuario(fun,usuario){
+        this.enviarPeticion(fun,'api/0.1/user/levels/'+usuario,'GET',null)
+    }
+
+    crear_usuario(fun,usuario,contra){
+        this.enviarPeticion(fun,'api/0.1/users','POST',{username:usuario,password:contra})
+    }
+
+    pedir_usuarios(fun){
+        this.enviarPeticion(fun,'api/0.1/users','GET',null,true)
+    }
+
+    eliminar_permiso_usuario(fun,usuario,permiso){
+        this.enviarPeticion(fun,'api/0.1/user/levels/delete','POST',{level:permiso,user_id:usuario},true,true)
+    }
+
+    agregar_permiso_usuario(fun,usuario,permiso){
+        this.enviarPeticion(fun,'api/0.1/user/levels/add','POST',{level:permiso,user_id:usuario},true,true)
+    }
+
     pedir_horas_extras_empleados(fun,inicio,fin){
-        console.log('entra')
         this.enviarPeticion(fun,'api/0.1/overtime/list/dependencies','POST',{initial_date:inicio,end_date:fin},true);
     }
 
@@ -63,7 +83,6 @@ export default class DBHandler{
     }
 
     pedir_horas_extras(fun,datos){
-        console.log(datos);
         this.enviarPeticion(fun,'api/0.1/overtime/jurisdiction','POST',{
             initial_date:datos.desde,
             end_date:datos.hasta},true);
@@ -216,6 +235,7 @@ export default class DBHandler{
         request.open(metodo,"http://"+host+this.PORT+"/"+url,asinc);
         var datosFinales = {};
         if(credenciales){
+            let cont = document.getElementById('main');
             request.setRequestHeader('auth_token',document.cookie.split(';')[0].substring(11));
             request.setRequestHeader('username',document.cookie.split(';')[1].split('=')[1]);
         }
