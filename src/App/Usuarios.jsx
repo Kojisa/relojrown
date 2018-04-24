@@ -67,17 +67,18 @@ class Usuarios extends Component{
 
 
         return(
-            <div>
-                <div style={{width:'200px',height:'80%',overflowY:'auto'}}>
+            <div style={{height:'100%'}}>
+                <Paper style={{width:'200px',height:'80%',overflowY:'auto',display:'inline-block',margin:'5px'}}>
                     <RaisedButton
                         primary={true}
                         label="Nuevo"
-                        onClick={()=>this.setState({elegido:''})} />
+                        onClick={()=>this.setState({elegido:''})}
+                        />
                     <ListaUsuarios usuarios={this.state.usuarios}/>
-                </div>
-                <div style={{display:'inline-block'}} >
+                </Paper>
+                <Paper style={{display:'inline-block',verticalAlign:'top',marginLeft:'10px'}} >
                     {edicion}
-                </div>
+                </Paper>
             </div>
         )
     }
@@ -419,7 +420,7 @@ class DatosUsuario extends Component{
         }
 
         return(
-            <div>
+            <div style={{margin:'5px'}} >
                 <TextField
                 floatingLabelText="Usuario"
                 value={this.state.usuario} 

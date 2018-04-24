@@ -48,9 +48,6 @@ for (let x = 0; x < Object.keys(permisos).length; x++){
 }
 
 
-
-
-
 export function DecodificarPermisos(permUsu){
     let final = {}
     for (let permiso in permUsu){
