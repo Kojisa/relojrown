@@ -24,7 +24,7 @@ def pedirDatos():
     datos = []
 
     for secretaria in range(len(secretarias)):
-        cur.execute(orden.format(secretarias[secretarias]))
+        cur.execute(orden.format(secretarias[secretaria]))
 
         dic = {}
 
