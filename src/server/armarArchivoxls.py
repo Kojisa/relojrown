@@ -8,13 +8,13 @@ DB = 'MBROWN'
 
 
 def pedirDatos():
-    orden = "Select o.docket_id,dep.nombre SUM(o.amount), SUM(o.amount*(o.hour_value/(180*60))*o.mod),o.mod \
+    orden = "Select o.docket_id,dep.nombre, SUM(o.amount), SUM(o.amount*(o.hour_value/(180*60))*o.mod),o.mod \
     from overtimes o, DEPENDENCIAS dep \
     where o.o_date >= TO_DATE( '2018-04-01', 'YYYY-MM-DD' ) \
     and o.o_date <= TO_DATE( '2018-04-30', 'YYYY-MM-DD' )\
     and o.dependence_id = dep.codigo \
     and dep.JURISDICCION = '{}' \
-    group_by o.docket_id,o.mod"
+    group_by o.docket_id,o.mod;"
 
     con,cur = conectar()
 
@@ -24,15 +24,15 @@ def pedirDatos():
     datos = []
 
     for secretaria in range(len(secretarias)):
-        cur.execute(orden.format(secretarias[x]))
+        cur.execute(orden.format(secretarias[secretarias]))
 
         dic = {}
 
         for res in cur.fetchall():
-            if !(res[1] in dic):
+            if not (res[1] in dic):
                 dic[res[1]] = [res[1],{}]
             
-            if !(res[0] in dic):
+            if not (res[0] in dic):
                 dic[res[1]][res[0]] = [ res[0],[ [0,0],[0,0],[0,0],[0,0] ] ]
             
 
