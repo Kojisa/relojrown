@@ -8,7 +8,7 @@ DB = 'MBROWN'
 
 
 def pedirDatos():
-    orden = "Select o.docket_id,dep.nombre, SUM(o.amount), SUM(o.amount*(o.hour_value/(180*60))*o.mod),o.mod from overtimes o, DEPENDENCIAS dep where o.o_date >= TO_DATE( '2018-04-01', 'YYYY-MM-DD' ) and o.o_date <= TO_DATE( '2018-04-30', 'YYYY-MM-DD' ) and o.dependence_id = dep.codigo and dep.JURISDICCION = '{}' group by o.docket_id,o.mod;"
+    orden = "Select o.docket_id,dep.nombre, SUM(o.amount), SUM(o.amount*(o.hour_value/(180*60))*o.mod),o.mod from overtimes o, DEPENDENCIAS dep where o.o_date >= TO_DATE( '2018-04-01', 'YYYY-MM-DD' ) and o.o_date <= TO_DATE( '2018-04-30', 'YYYY-MM-DD' ) and o.dependence_id = dep.codigo and dep.JURISDICCION = '{}' group by o.docket_id,o.mod"
 
     con,cur = conectar()
 
@@ -63,7 +63,7 @@ def armarArchivo(datos):
         columnas = ['Legajo','Horas al 50%','Gasto al 50%','Horas al 100%'
         ,'Gasto al 100%','Horas al 50%N','Gasto al 50%N','Horas al 100%N','Gasto al 100%N']
         for x in range(len(columnas)):
-            pagina.cell(row=fila,column=x,value=columnas[x])
+            pagina.cell(row=fila,column=x + 1,value=columnas[x])
         
         fila += 2
 
