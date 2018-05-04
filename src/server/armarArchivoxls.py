@@ -8,13 +8,7 @@ DB = 'MBROWN'
 
 
 def pedirDatos():
-    orden = "Select o.docket_id,dep.nombre, SUM(o.amount), SUM(o.amount*(o.hour_value/(180*60))*o.mod),o.mod \
-    from overtimes o, DEPENDENCIAS dep \
-    where o.o_date >= TO_DATE( '2018-04-01', 'YYYY-MM-DD' ) \
-    and o.o_date <= TO_DATE( '2018-04-30', 'YYYY-MM-DD' )\
-    and o.dependence_id = dep.codigo \
-    and dep.JURISDICCION = '{}' \
-    group by o.docket_id,o.mod;"
+    orden = "Select o.docket_id,dep.nombre, SUM(o.amount), SUM(o.amount*(o.hour_value/(180*60))*o.mod),o.mod from overtimes o, DEPENDENCIAS dep where o.o_date >= TO_DATE( '2018-04-01', 'YYYY-MM-DD' ) and o.o_date <= TO_DATE( '2018-04-30', 'YYYY-MM-DD' ) and o.dependence_id = dep.codigo and dep.JURISDICCION = '{}' group by o.docket_id,o.mod;"
 
     con,cur = conectar()
 
@@ -24,6 +18,7 @@ def pedirDatos():
     datos = []
 
     for secretaria in range(len(secretarias)):
+        print orden.format(secretarias[secretaria])
         cur.execute(orden.format(secretarias[secretaria]))
 
         dic = {}
@@ -46,7 +41,7 @@ def pedirDatos():
             elif(res[4] == 16):
                 dic[res[1]][res[0]][1][3] = [res[2],res[3]]
 
-        datos.append([nombres[x],dic])
+        datos.append([nombres[secretaria],dic])
 
     return datos
 
