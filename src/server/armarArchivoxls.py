@@ -14,7 +14,7 @@ def pedirDatos():
     and o.o_date <= TO_DATE( '2018-04-30', 'YYYY-MM-DD' )\
     and o.dependence_id = dep.codigo \
     and dep.JURISDICCION = '{}' \
-    group_by o.docket_id,o.mod;"
+    group by o.docket_id,o.mod;"
 
     con,cur = conectar()
 
