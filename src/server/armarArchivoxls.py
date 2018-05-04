@@ -18,8 +18,8 @@ def pedirDatos():
     datos = []
 
     for secretaria in range(len(secretarias)):
-        print orden.format(secretarias[secretaria])
-        cur.execute(orden.format(secretarias[secretaria]))
+        
+        cur.execute(orden.format(secretarias[secretaria]).encode('utf8'))
 
         dic = {}
 
@@ -28,18 +28,18 @@ def pedirDatos():
                 dic[res[1]] = [res[1],{}]
             
             if not (res[0] in dic):
-                dic[res[1]][res[0]] = [ res[0],[ [0,0],[0,0],[0,0],[0,0] ] ]
+                dic[res[1]][1][res[0]] = [ res[0],[ [0,0],[0,0],[0,0],[0,0] ] ]
             
 
 
             if(res[4] == 1.5):
-                dic[res[1]][res[0]][1][0] = [res[2],res[3]]
+                dic[res[1]][1][res[0]][1][0] = [res[2],res[3]]
             elif(res[4] == 2):
-                dic[res[1]][res[0]][1][1] = [res[2],res[3]]
+                dic[res[1]][1][res[0]][1][1] = [res[2],res[3]]
             elif(res[4] == 12):
-                dic[res[1]][res[0]][1][2] = [res[2],res[3]]
+                dic[res[1]][1][res[0]][1][2] = [res[2],res[3]]
             elif(res[4] == 16):
-                dic[res[1]][res[0]][1][3] = [res[2],res[3]]
+                dic[res[1]][1][res[0]][1][3] = [res[2],res[3]]
 
         datos.append([nombres[secretaria],dic])
 
