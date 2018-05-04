@@ -95,32 +95,18 @@ def armarArchivo(datos):
 
     archivo.save('resumen abril.xlsx')
 
-            
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+def main():
+    datos = pedirDatos()
+    armarArchivo(datos)
 
 
 def conectar():
     con = ORA.connect(""+US + "/" + PASS + "@" + HOST + "/" + DB)
     cur = con.cursor()
     return con,cur
+
+
+
+main()
