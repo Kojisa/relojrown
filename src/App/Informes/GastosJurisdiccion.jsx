@@ -86,8 +86,8 @@ export default class InformeGlobal extends Component{
                             
                             gastos[info[x].dependence_id] = {gasto:0,cantHoras:0}
                         }
-                        gastos[info[x].dependence_id].gasto = Math.round(info[x].result * 100) /100;
-                        gastos[info[x].dependence_id].cantHoras = Math.round(info[x].acumulated_hours * 100) /100;
+                        gastos[info[x].dependence_id].gasto += Math.round(info[x].result * 100) /100;
+                        gastos[info[x].dependence_id].cantHoras += Math.round(info[x].acumulated_hours * 100) /100;
                         let pos = tipos[info[x].hour_type];
                         dic[pos].gasto += Math.round(info[x].result * 100) /100;
                         dic[pos].cantHoras += Math.round(info[x].acumulated_hours * 100) /100;

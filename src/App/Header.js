@@ -21,7 +21,7 @@ import HorasExtras from './Dependencias/HorasExtras';
 import informes from './Informes/PrincipalInformes';
 import Home from './Home/HomeCuentas';
 import Usuarios from './Usuarios';
-
+import HOME from 'homedir';
     
     class Nav extends React.Component{
         lista = [ //futuro formato [nombre,icono,funcion]
@@ -217,7 +217,6 @@ import Usuarios from './Usuarios';
     
     
         ver_cookie(datos){
-            console.log(datos);
             document.cookie = "auth="+datos["auth_token"] + ";";
             this.setState({render:true});
         }
