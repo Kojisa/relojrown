@@ -73,12 +73,12 @@ def armarArchivo(datos):
         fila += 2
 
 
-        for dependencia in dependencias:
+        for dependencia in dependencias.values():
 
             pagina.cell(row=fila,column=1,value=dependencia[0])
             fila += 1
 
-            for legajo in dependencia[1]:
+            for legajo in dependencia[1].values():
                 columna = 1
 
                 pagina.cell(row=fila,column=columna,value=legajo[0])
