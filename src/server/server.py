@@ -36,4 +36,4 @@ def devolverPagina():
     return static_file("index.html",root="../../build/")
 
 
-run(host="localhost", port=80)
+run(host="localhost", port=3000)
