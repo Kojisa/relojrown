@@ -8,12 +8,12 @@ DB = 'MBROWN'
 
 
 def pedirDatos():
-    orden = "Select o.docket_id,dep.nombre, SUM(o.amount), SUM(o.amount*(o.hour_value/(180*60))*o.mod),o.mod \
+    orden = "Select o.docket_id,dep.descripcion, SUM(o.amount), SUM(o.amount*(o.hour_value/(180*60))*o.mod),o.mod \
     from overtimes o, DEPENDENCIAS dep \
     where o.o_date >= TO_DATE( '2018-04-01', 'YYYY-MM-DD' ) \
     and o.o_date <= TO_DATE( '2018-04-30', 'YYYY-MM-DD' ) \
     and o.dependence_id = dep.codigo and dep.JURISDICCION = '{}' \
-    group by o.docket_id,o.mod"
+    group by o.docket_id,dep.descripcion,o.mod"
 
     con,cur = conectar()
 

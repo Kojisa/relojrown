@@ -83,7 +83,7 @@ export default class InformeGlobal extends Component{
                     {name:'100%N',cantHoras:0,gasto:0}
                 ];
                 let gastos = {};
-                console.log(info);
+                
                 let tipos = {'100%':0,'50%':1,'50%N':2,'100%N':3}
                 for (let x = 0; x < info.length; x++){
                     
