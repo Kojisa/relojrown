@@ -59,5 +59,3 @@ typings/
 
 .vscode/launch.json
 
-# build directory
-build/
