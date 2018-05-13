@@ -130,7 +130,7 @@ def armarArchivo(datos):
             
             fila += 2
 
-    archivo.save('resumenabril.xlsx')
+    archivo.save('resumen.xlsx')
 
 
 @route('/informe/excel',method='POST')
@@ -140,6 +140,7 @@ def main():
     hasta = datos['end_date']
     info = pedirDatos(desde,hasta)
     armarArchivo(info)
+    return static_file('resumen.xlsx',root='./')
 
 
 
