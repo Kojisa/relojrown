@@ -47,6 +47,7 @@ def pedirDatos(desde,hasta):
     from overtimes o, DEPENDENCIAS dep \
     where o.o_date >= TO_DATE( '{}', 'YYYY-MM-DD' ) \
     and o.o_date <= TO_DATE( '{}', 'YYYY-MM-DD' ) \
+    and o.dependence_id = dep.codigo \
     group by o.docket_id,dep.descripcion,o.mod"
 
     con,cur = conectar()
