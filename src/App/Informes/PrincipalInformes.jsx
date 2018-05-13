@@ -141,10 +141,12 @@ class Contenedor extends Component{
                         if(this.readyState == 4 && this.status == 200){
                             console.log('entra2')
                             var blob = this.response;
-                            var filename = this.getResponseHeader("Content-Disposition").match(/\sfilename="([^"]+)"(\s|$)/)[1];
+                            console.log(blob)
+                            var filename = 'informe.xlsx';
                             let a = document.createElement('a');
                             a.href = window.URL.createObjectURL(blob);
                             a.download = filename;
+                            console.log(a.href)
                             a.click();
 
                         }
@@ -154,9 +156,10 @@ class Contenedor extends Component{
                     if (window.location.href.indexOf(this.HOST) < 0){
                         host = this.HOSTRAFAM;
                     }
-            
-                    request.responseType = 'blob';
+                    
                     request.open('POST',"http://"+host+":" +3000+"/informe/excel",true);
+                    request.setRequestHeader('Access-Control-Allow-Origin','*')
+                    request.responseType = 'blob';
                     var datosFinales = {};
                     if (datos){
                         request.setRequestHeader('Content-type','application/json');

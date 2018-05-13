@@ -20,6 +20,7 @@ def enable_cors():
     response.add_header("Access-Control-Allow-Methods", "POST,GET")
     response.add_header("Access-Control-Allow-Headers", "Origin, Accept, Content-Type")
     response.add_header("Access-Control-Max-Age", "1728000")
+    
 
 @post('/cors')
 def lvambience():
@@ -140,6 +141,7 @@ def main():
     hasta = datos['end_date']
     info = pedirDatos(desde,hasta)
     armarArchivo(info)
+    
     return static_file('resumen.xlsx',root='./')
 
 
