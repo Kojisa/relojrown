@@ -28,6 +28,11 @@ export default function main(props){
 
 
 class Contenedor extends Component{
+
+    HOST = "172.20.0.3";//"10.10.10.52";//"172.20.0.3";
+    HOSTRAFAM = '172.22.20.241';//"10.10.10.52";//'172.22.20.241';
+
+
     constructor(props){
         super(props);
         this.state={
@@ -125,6 +130,45 @@ class Contenedor extends Component{
                                     {this.state.dependencias.map((elem,index)=><MenuItem value={elem[0]} primaryText={elem[1]} key={index} />)}
                         </SelectField>
         }
+        let botonImprimir = null;
+        if(this.state.tipo === 0){
+            botonImprimir = <RaisedButton label='Imprimir' onClick={
+                ()=>{
+                    console.log('entra')
+                    let datos = {initial_date:this.state.inicio,end_date:this.state.fin};
+                    var request = new XMLHttpRequest();
+                    request.onreadystatechange = function(){
+                        if(this.readyState == 4 && this.status == 200){
+                            console.log('entra2')
+                            var blob = this.response;
+                            var filename = this.getResponseHeader("Content-Disposition").match(/\sfilename="([^"]+)"(\s|$)/)[1];
+                            let a = document.createElement('a');
+                            a.href = window.URL.createObjectURL(blob);
+                            a.download = filename;
+                            a.click();
+
+                        }
+                    };
+            
+                    let host = this.HOST;
+                    if (window.location.href.indexOf(this.HOST) < 0){
+                        host = this.HOSTRAFAM;
+                    }
+            
+                    request.responseType = 'blob';
+                    request.open('POST',"http://"+host+":" +3000+"/informe/excel",true);
+                    var datosFinales = {};
+                    if (datos){
+                        request.setRequestHeader('Content-type','application/json');
+                        request.send(JSON.stringify(datos));
+                        
+                    }
+            
+                    else {request.send();}
+                }
+            }
+            />
+        }
 
         return(
             <div>
@@ -140,6 +184,7 @@ class Contenedor extends Component{
                     <br/>
                     <Fechas funActInicio={(valor)=>this.setState({inicio:valor})}
                     funActFin={(valor)=>this.setState({fin:valor})} />
+                    {botonImprimir}
                 </div>
                 <div style={{marginTop:'10px'}}>
                     {informe}
