@@ -63,7 +63,7 @@ def pedirDatos(desde,hasta):
 
     for secretaria in range(len(secretarias)):
         
-        cur.execute(orden.format(desde,hasta,secretarias[secretaria]).encode('utf8'))
+        cur.execute(orden.format(desde,hasta,secretarias[secretaria[0]]).encode('utf8'))
 
         dic = {}
 
