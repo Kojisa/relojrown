@@ -53,17 +53,16 @@ def pedirDatos(desde,hasta):
 
     con,cur = conectar()
 
-    ordenSecretarias = 'Select jurisdiccion from jurisdicciones'
+    ordenSecretarias = 'Select jurisdiccion,denominacion from jurisdicciones'
     cur.execute(ordenSecretarias)
     secretarias = cur.fetchall()
-    print secretarias
-    nombres = ['Gobierno','Salud','Infraestructura','Seguridad']
+    
     
     datos = []
 
     for secretaria in range(len(secretarias)):
         
-        cur.execute(orden.format(desde,hasta,secretarias[secretaria[0]]).encode('utf8'))
+        cur.execute(orden.format(desde,hasta,secretarias[secretaria][0]).encode('utf8'))
 
         dic = {}
 
@@ -85,7 +84,7 @@ def pedirDatos(desde,hasta):
             elif(res[4] == 16):
                 dic[res[1]][1][res[0]][1][3] = [res[2],res[3]]
 
-        datos.append([nombres[secretaria],dic])
+        datos.append([secretarias[secretaria][1],dic])
 
     return datos
 
