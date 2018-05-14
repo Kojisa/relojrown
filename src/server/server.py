@@ -55,7 +55,7 @@ def pedirDatos(desde,hasta):
 
     ordenSecretarias = 'Select jurisdiccion from jurisdicciones'
     cur.execute(ordenSecretarias)
-    secretarias = cur.fecthall()
+    secretarias = cur.fetchall()
     print secretarias
     nombres = ['Gobierno','Salud','Infraestructura','Seguridad']
     
