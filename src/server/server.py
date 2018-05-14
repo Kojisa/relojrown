@@ -48,11 +48,15 @@ def pedirDatos(desde,hasta):
     where o.o_date >= TO_DATE( '{}', 'YYYY-MM-DD' ) \
     and o.o_date <= TO_DATE( '{}', 'YYYY-MM-DD' ) \
     and o.dependence_id = dep.codigo \
+    and dep.jurisdiccion = '{}' \
     group by o.docket_id,dep.descripcion,o.mod"
 
     con,cur = conectar()
 
-    secretarias = ['1110119000','1110108000','1110122000','11101200000']
+    ordenSecretarias = 'Select jurisdiccion from jurisdicciones;'
+    cur.execute(ordenSecretarias)
+    secretarias = cur.fecthall()
+    print secretarias
     nombres = ['Gobierno','Salud','Infraestructura','Seguridad']
     
     datos = []
