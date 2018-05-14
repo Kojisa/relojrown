@@ -53,7 +53,7 @@ def pedirDatos(desde,hasta):
 
     con,cur = conectar()
 
-    ordenSecretarias = 'Select jurisdiccion from jurisdicciones;'
+    ordenSecretarias = 'Select jurisdiccion from jurisdicciones'
     cur.execute(ordenSecretarias)
     secretarias = cur.fecthall()
     print secretarias
