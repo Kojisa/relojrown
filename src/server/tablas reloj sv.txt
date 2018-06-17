@@ -1,0 +1,59 @@
+SELECT  [USERID] #id interna
+      ,[CHECKTIME] #horario fichada
+      ,[CHECKTYPE] #trata de imaginarse si es entrada y salida (creo que funciona en fichadas reiteradas en poco tiempo)
+      ,[VERIFYCODE] #no se
+      ,[SENSORID] #id de huellero, no se si es importante, pero por ahi lo podemos guardar, o capaz lo piden
+      ,[LOGID] #id de la fichada (un autoincrement, pero no se correlaciona el roden con el horario de fichada)
+      ,[MachineId] 
+      ,[UserExtFmt]
+      ,[WorkCode]
+      ,[Memoinfo]
+      ,[sn]
+  FROM [rafam_relojes].[dbo].[CHECKINOUT]
+ order by CHECKTIME DESC
+
+ #el resto de los datos no estan cargados o no parecen importar para nada
+ 
+ SELECT [USERID] #id interna
+      ,[BADGENUMBER] #legajo de rafam
+      ,[SSN] 
+      ,[NAME] #nombre no normalizado
+      ,[GENDER]
+      ,[TITLE]
+      ,[PAGER]
+      ,[BIRTHDAY]
+      ,[HIREDDAY]
+      ,[STREET]
+      ,[CITY]
+      ,[STATE]
+      ,[ZIP]
+      ,[OPHONE]
+      ,[FPHONE]
+      ,[VERIFICATIONMETHOD]
+      ,[DEFAULTDEPTID]
+      ,[SECURITYFLAGS]
+      ,[ATT]
+      ,[INLATE]
+      ,[OUTEARLY]
+      ,[OVERTIME]
+      ,[SEP]
+      ,[HOLIDAY]
+      ,[MINZU]
+      ,[PASSWORD]
+      ,[LUNCHDURATION]
+      ,[MVERIFYPASS]
+      ,[PHOTO]
+      ,[Notes]
+      ,[privilege]
+      ,[InheritDeptSch]
+      ,[InheritDeptSchClass]
+      ,[AutoSchPlan]
+      ,[MinAutoSchInterval]
+      ,[RegisterOT]
+      ,[InheritDeptRule]
+      ,[reserve]
+      ,[EMPRIVILEGE]
+      ,[CardNo]
+      ,[Pin1]
+      ,[SSMA_TimeStamp]
+  FROM [rafam_relojes].[dbo].[USERINFO]
