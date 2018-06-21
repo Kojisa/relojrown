@@ -2,8 +2,8 @@
 export default class DBHandler{
     
     PORT = ":8000";// ":8000";
-    HOST = "172.20.0.3";//"10.10.10.52";//"172.20.0.3";
-    HOSTRAFAM = '172.22.20.241';//"10.10.10.52";//'172.22.20.241';
+    HOST = "10.10.10.52";//"172.20.0.3";
+    HOSTRAFAM = '10.10.10.52'//'172.22.20.241';//"10.10.10.52";//'172.22.20.241';
     RUTABASICA = 'api/0.1/';
 
 
@@ -126,11 +126,11 @@ export default class DBHandler{
     }
 
     guardar_planillon(fun,id,descripcion){
-        this.enviarPeticion(fun,'/api/0.1/buildings','PUT',{building_id:id,description:descripcion})
+        this.enviarPeticion(fun,'api/0.1/buildings','PUT',{building_id:id,description:descripcion})
     }
 
-    guardar_horario(datos,legajo){
-        this.enviarPeticion((datos)=>(console.log(datos)),'api/0.1/schedule/'+legajo,'POST',datos,true);
+    guardar_horario(fun,datos,legajo){
+        this.enviarPeticion(fun,'api/0.1/schedule/'+legajo,'POST',datos,true);
     }
 
     pedir_horarios_persona(fun,legajo){

@@ -27,7 +27,8 @@ class Contenedor extends Component{
         this.state={
             elegido:'',
             planillones:[], //lista de pares clave-descripcion.
-            filtro:''
+            filtro:'',
+            ref:{}
         }
 
         this.actualizarFiltro = this.actualizarFiltro.bind(this);
@@ -54,9 +55,13 @@ class Contenedor extends Component{
     }
 
     cargarPlanillones(datos){
-        console.log(datos);
+        let ref = {};
+        for( let x = 0; x < datos.buildings.length; x++){
+            ref[datos.buildings[x][0]] = datos.buildings[x][1]
+        }
         this.setState({
-            planillones:datos.buildings
+            planillones:datos.buildings,
+            ref:ref
         })
     }
 
@@ -79,7 +84,6 @@ class Contenedor extends Component{
     }
 
     actualizarNuevo(){
-        console.log('entra')
         this.actualizarElegido('NUEVO');
     }
 
@@ -98,19 +102,20 @@ class Contenedor extends Component{
 
     render(){
         let edicion= null;
+        console.log(this.state.ref);
         if(this.state.elegido != ''){
             let descripcion = ''
             if(this.state.elegido === 'NUEVO'){
                 descripcion = '';
             }
             else{
-                descripcion = this.state.planillones[this.state.elegido]
+                descripcion = this.state.ref[this.state.elegido]
             }
             edicion= (
             <Paper style={{display:'inline-block',verticalAlign:'top',float:'left',marginLeft:'10px'}}>
                 <div style={{margin:'5px'}} >
                     <EdicionPlanillon codigo={this.state.elegido} 
-                    descripcion={descripcion}/>
+                    descripcion={descripcion} funAct={this.pedirPlanillones}/>
                 </div>
             </Paper>)
             
@@ -156,6 +161,7 @@ class EdicionPlanillon extends Component{
         this.db = new DBHandler();
         this.actualizar = this.actualizar.bind(this);
         this.guardar = this.guardar.bind(this);
+        this.funAct = props.funAct;
     }
 
     actualizar(evento){
@@ -166,11 +172,16 @@ class EdicionPlanillon extends Component{
     }
 
     guardar(){
-        this.db.guardar_planillon(null,this.state.codigo,this.state.descripcion);
+        if(this.state.codigo === '' || this.state.codigo === null){
+            this.db.pedir_planillones((datos)=>{this.db.guardar_planillon(this.funAct,(datos.buildings.length + 1),this.state.descripcion)})
+        }
+        else{
+            this.db.guardar_planillon(this.funAct,this.state.codigo,this.state.descripcion);
+        }
     }
 
     componentWillReceiveProps(props){
-        
+        console.log(props);
         if(props.codigo === 'NUEVO'){
             this.setState({
                 codigo:'',

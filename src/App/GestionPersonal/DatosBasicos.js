@@ -51,6 +51,7 @@ class Contenedor extends Component{
         this.pedirDatos = this.pedirDatos.bind(this);
         this.agregarPlanillon = this.agregarPlanillon.bind(this);
         this.enviarDatos = this.enviarDatos.bind(this);
+        this.borrarItinerario = this.borrarItinerario.bind(this);
 
         this.db = new DBHandler();
         
@@ -115,6 +116,12 @@ class Contenedor extends Component{
             this.db.pedir_nombre((dato)=>(this.setState({persona:dato.name})),this.state.legajo)
         }
     }
+    //plani es la posicion del planillon en la lista
+    borrarItinerario(horario){
+        let horarios = this.state.horarios;
+        horarios.splice(horario,1);
+        this.setState({horarios:horarios});
+    }
 
     actualizarHorarios(pos,info){
         let horarios = this.state.horarios;
@@ -136,10 +143,11 @@ class Contenedor extends Component{
                         valid_from:horarios[x].valid_from,
                         valid_to:horarios[x].valid_to,
                     }
-                    this.db.guardar_horario(dic,this.state.legajo);
-
+                    this.db.guardar_horario((datos)=>console.log(datos),dic,this.state.legajo);
+                
                 }
             }
+            this.pedirDatos();
         }
     }
 
@@ -147,10 +155,7 @@ class Contenedor extends Component{
         let horarios = null;
         
         horarios = <Horarios horarios={this.state.horarios} planillones={this.state.planillones}
-        funAct={this.actualizarHorarios} funAgregar={this.agregarPlanillon}/>
-        
-        
-
+        funAct={this.actualizarHorarios} funAgregar={this.agregarPlanillon} funBor={this.borrarItinerario}/>
         return (
             <div >
                 <div style={{display:'inline-block',margin:'5px'}}>
@@ -340,6 +345,7 @@ class Horarios extends Component{
         this.actualizarHorario = props.funAct;
         this.habilitarPlanillones = props.habilitarPlanillones;
         this.funAgregar = props.funAgregar;
+        this.borrarItinerario = props.funBor;
     }
     
 
@@ -349,12 +355,17 @@ class Horarios extends Component{
     cargarPlanillones(){
         let lista = [];
         for (let x = 0; x < this.state.horarios.length; x++){
+            let borrarItinerario = <RaisedButton label={<label>Eliminar Itinerario</label>} secondary={true} style={{float:'right'}}
+            onClick={()=>this.borrarItinerario(x)} />
+            if(this.state.horarios[x].nuevo === false){
+                borrarItinerario = null;
+            }
             let tab = (<Tab label={this.state.planillones[parseInt(this.state.horarios[x].building) -1 ][1]} key={x} value={this.state.horarios[x].building}> 
                 <HorarioSemanal funAct={this.actualizarHorario} semana={this.state.horarios[x].schedule} desde={this.state.horarios[x].valid_from}
                 hasta={this.state.horarios[x].valid_to} orden={x} dependencia={this.state.horarios[x].building}
                 nuevo={this.state.horarios[x].nuevo} modificado={this.state.horarios[x].modificado} />
                 <br/>
-                <RaisedButton label={<label>Eliminar Planillon</label>} secondary={true} style={{float:'right'}} />
+                {borrarItinerario}
             </Tab>);
             lista.push(tab);
         }
@@ -434,7 +445,7 @@ class HorarioSemanal extends Component{
         let minutos = parseInt(string[3]+string[4]);
         let final = hora + minutos;
         final = final.toFixed(2);
-        return final;
+        return parseInt(final);
     }
 
 
@@ -456,6 +467,10 @@ class HorarioSemanal extends Component{
         horarios[indice][0] = this.pasarHoraNumero(dato);
         let estado = this.state;
         estado.semana = horarios;
+
+        if(horarios[indice][1] != null && dato != '' && horarios[indice][0] >= horarios[indice][1] ){
+            horarios[indice][1] += 1440
+        }
         this.actualizarPadre(estado);
 
 
@@ -469,6 +484,9 @@ class HorarioSemanal extends Component{
             horarios[indice]=[,];
         }
         horarios[indice][1] = this.pasarHoraNumero(dato);
+        if(horarios[indice][0] != null && dato != '' && horarios[indice][0] >= horarios[indice][1] ){
+            horarios[indice][1] += 1440
+        }
         let estado = this.state;
         estado.semana = horarios;
         this.actualizarPadre(estado);
@@ -520,11 +538,17 @@ class HorarioSemanal extends Component{
                 salida = this.transformarHora(datos[elem.toLocaleLowerCase()][1]);
                 
             }
+            let modificable = true;
+            if(this.state.nuevo === true){
+                modificable = false;
+            }
             return(<div style={{width:'350px', marginLeft:'5px'}} key={index.toString()} >
                 <span style={{width:'100px',display:'inline-block'}} >{dias[index]} :</span>
-                <TextField value={entrada} onChange={this.cambiarIngreso} name={elem.toLowerCase()} type='time' style={{width:'80px'}}/>
+                <TextField value={entrada} onChange={this.cambiarIngreso} name={elem.toLowerCase()} type='time' style={{width:'80px'}}
+                disabled={modificable}/>
                 <label htmlFor="" style={{width:40,display:'inline-block'}}>-</label>
-                <TextField value={salida} onChange={this.cambiarSalida} name={elem.toLowerCase()} type='time' style={{width:'80px'}}/>
+                <TextField value={salida} onChange={this.cambiarSalida} name={elem.toLowerCase()} type='time' style={{width:'80px'}}
+                disabled={modificable}/>
             </div>)   
         }
     )
@@ -533,11 +557,13 @@ class HorarioSemanal extends Component{
 
 
     render(){
+        let noEditable = !this.state.nuevo
+
         return(
             <div>
                 <label htmlFor="">Valido: </label>
                 <TextField floatingLabelText={ <label htmlFor="">Desde</label> } value={this.state.desde}
-                onChange={this.actualizarFechas} name='desde' type='date' style={{width:145}} />
+                onChange={this.actualizarFechas} name='desde' type='date' style={{width:145}} disabled={noEditable}/>
                 <TextField floatingLabelText={ <label htmlFor="">Hasta</label> } value={this.state.hasta}
                 onChange={this.actualizarFechas} name='hasta' type='date'  style={{width:145}} />
                 <br/>
@@ -584,6 +610,9 @@ class AgregarPlanillon extends Component{
 
 
     generarPlanillon(){
+        if(this.state.codigo === '' || this.state.nombre === ''){
+            return;
+        }
         this.agregarPlanillon(this.state.codigo);
     }
 
@@ -600,7 +629,8 @@ class AgregarPlanillon extends Component{
             }
             else{
                 this.setState({
-                    codigo:valor
+                    codigo:valor,
+                    nombre:''
                 })
             }
         }
@@ -614,6 +644,7 @@ class AgregarPlanillon extends Component{
             else{
                 this.setState({
                     nombre:valor,
+                    codigo:'',
                 })
             }
         }
@@ -621,6 +652,12 @@ class AgregarPlanillon extends Component{
     }
 
     render(){
+
+        let elegir = <RaisedButton label='Elegir' style={{float:'right'}} onClick={this.generarPlanillon}/>
+        if(this.state.codigo === '' || this.state.nombre === ''){
+            elegir = null;
+        }
+
         return(
             <div style={{marginLeft:'5px',display:'inline-block'}}>
                 <AutoComplete floatingLabelText={<label>Codigo Planillon</label>} searchText={this.state.codigo} name='codigo' type='text'
@@ -630,13 +667,11 @@ class AgregarPlanillon extends Component{
                 }} dataSource={Object.keys(this.state.codigos).sort()}/>
                 <AutoComplete floatingLabelText={<label>Planillon</label>} searchText={this.state.nombre} name='nombre' type='text'
                 onBlur={this.actualizarVariables} onNewRequest={(elegido,indice)=>{
-                    console.log(elegido);
-                    console.log(indice);
                     let evento = {target:{name:'nombre',value:elegido}};
                     this.actualizarVariables(evento);
                 }} dataSource={Object.keys(this.state.planillones).sort()}/>
                 <br/>
-                <RaisedButton label='Elegir' style={{float:'right'}} onClick={this.generarPlanillon}/>
+                {elegir}
             </div>
         )
     }
