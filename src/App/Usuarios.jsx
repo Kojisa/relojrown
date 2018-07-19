@@ -151,6 +151,7 @@ class DatosUsuario extends Component{
         this.db = new DBHandler();
         this.actualizarUsuario = this.actualizarUsuario.bind(this);
         this.cargarUsuario = this.cargarUsuario.bind(this);
+        this.usuarioCreado = this.usuarioCreado.bind(this)
         if(props.usuario != ''){
             this.db.pedir_datos_usuario(this.cargarUsuario)
         }

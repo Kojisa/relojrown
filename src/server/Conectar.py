@@ -2,8 +2,8 @@ import cx_Oracle as ORA
 
 US = 'owner_rafam'
 PASS = 'ownerdba'
-HOST = '172.22.20.151:1521'
-DB = 'MBROWN'
+HOST = '10.10.10.1'#'172.22.20.151:1521'
+DB = 'MSV'#MBROWN'
 
 
 def conectar():

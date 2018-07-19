@@ -118,11 +118,20 @@ class Contenedor extends Component{
     }
     //plani es la posicion del planillon en la lista
     borrarItinerario(horario){
+        
         let horarios = this.state.horarios;
+        let itinerario = this.state.horarios[horario]
+        
         horarios.splice(horario,1);
-        this.setState({horarios:horarios});
+        if(itinerario.nuevo === false){
+            this.db.borrar_horario(this.setState({horarios:horarios}),this.state.legajo,
+        itinerario.building,itinerario.valid_from)
+        }
+        else{
+            this.setState({horarios:horarios});
+    
+        }
     }
-
     actualizarHorarios(pos,info){
         let horarios = this.state.horarios;
         horarios[pos] = info;
@@ -272,6 +281,13 @@ class DatosBasicos extends Component{
             />
         }*/
 
+        let opcionales = <div>
+                            <Checkbox label={<label>25 Años de servicio: </label>} checked={this.state.anios25} onCheck={this.actualizarCheck}
+                             labelPosition='left' style={{paddingTop:'10px'}} />
+                            <br/>
+                            <Premio funAct={this.actualizarPremio} premio={this.state.premio} />
+                        </div>
+
         return(
             <div style={{width:'350px',display:'inline-block'}} >
                 <div style={{marginLeft:'15px'}}>
@@ -282,11 +298,9 @@ class DatosBasicos extends Component{
                         {this.generarTiposAsistencia()}
                     </SelectField>
                     <br/>
-                    <Checkbox label={<label>25 Años de servicio: </label>} checked={this.state.anios25} onCheck={this.actualizarCheck}
-                     labelPosition='left' style={{paddingTop:'10px'}} />
-                    <br/>
+                    
                     {dependencia}
-                    <Premio funAct={this.actualizarPremio} premio={this.state.premio} />
+                    
                 </div>
             </div>
         )
@@ -357,9 +371,7 @@ class Horarios extends Component{
         for (let x = 0; x < this.state.horarios.length; x++){
             let borrarItinerario = <RaisedButton label={<label>Eliminar Itinerario</label>} secondary={true} style={{float:'right'}}
             onClick={()=>this.borrarItinerario(x)} />
-            if(this.state.horarios[x].nuevo === false){
-                borrarItinerario = null;
-            }
+            
             let tab = (<Tab label={this.state.planillones[parseInt(this.state.horarios[x].building) -1 ][1]} key={x} value={this.state.horarios[x].building}> 
                 <HorarioSemanal funAct={this.actualizarHorario} semana={this.state.horarios[x].schedule} desde={this.state.horarios[x].valid_from}
                 hasta={this.state.horarios[x].valid_to} orden={x} dependencia={this.state.horarios[x].building}

@@ -73,7 +73,6 @@ export class CreacionConcepto extends Component{
     }
 
     cargarArticulo(datos){
-        console.log(datos);
         this.setState({
             articulo:datos.code,
             descripcion:datos.description,
@@ -90,8 +89,6 @@ export class CreacionConcepto extends Component{
     componentWillReceiveProps(props){
         
         let art = this.state.articulo;
-        console.log(props.articulo);
-        console.log(art);
         if(props.articulo === 'NUEVO'){
             this.setState({
                 articulo:'',
@@ -141,12 +138,13 @@ export class CreacionConcepto extends Component{
             'justify_list':this.state.justificaOtros,
         }
         if(this.state.articulo === ''){
-
-            this.db.crear_articulo((datos)=>{
-                console.log(datos);
-                this.setState({articulo:datos.code});
-                this.actualizarPadre();},datos);
-    
+            this.db.pedir_articulos((listado) =>{
+                datos.code = listado.lenght;
+                this.db.crear_articulo((datos)=>{
+                    this.setState({articulo:datos.code});
+                    this.actualizarPadre();},datos);
+            }
+            )
         }
         else{
             this.db.actualizar_articulo(this.actualizarPadre,datos);
@@ -157,6 +155,12 @@ export class CreacionConcepto extends Component{
 
 
     render(){
+        let opcionales = <div>
+                            <Checkbox label='Justifica' checked={this.state.justifica} name='justifica' onCheck={this.actualizarCheck} labelPosition='left'/>
+                            <br/>
+                            <Checkbox label='Modifica Archivo' checked={this.state.modArch} name='modArch' onCheck={this.actualizarCheck} labelPosition='left'/>
+
+                        </div>
 
         return(
             <div style={{display:'inline-block'}}>
@@ -171,12 +175,8 @@ export class CreacionConcepto extends Component{
                     <br/>
                     <Sexo actualizarPadre={this.actualizarValor} valor={this.state.sexo}/>
                     <br/>
-                    <Checkbox label='Justifica' checked={this.state.justifica} name='justifica' onCheck={this.actualizarCheck} labelPosition='left'/>
-                    <br/>
                     <Dias actualizarPadre={this.actualizarValor} valor={this.state.dias} />
                     <br/>
-                    <Checkbox label='Modifica Archivo' checked={this.state.modArch} name='modArch' onCheck={this.actualizarCheck} labelPosition='left'/>
-
                     <div>
                         <RaisedButton label='guardar' primary={true} onClick={this.guardarConcepto}/>
                     </div>

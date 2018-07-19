@@ -87,10 +87,8 @@ export default class DBHandler{
         this.enviarPeticion(fun,'api/0.1/overtime/jurisdiction','POST',{
             initial_date:datos.desde,
             end_date:datos.hasta},true);
-        /*this.enviarPeticion(fun,'api/0.1/overtime/dependencies','POST',{
-            initial_date:datos.desde,
-            end_date:datos.hasta},true);*/
     }
+    
 
     actualizar_presencia(fun,datos){
         let dic = {old_check_in:datos.original[0],
@@ -131,6 +129,10 @@ export default class DBHandler{
 
     guardar_horario(fun,datos,legajo){
         this.enviarPeticion(fun,'api/0.1/schedule/'+legajo,'POST',datos,true);
+    }
+
+    borrar_horario(fun,legajo,edificio,validoDesde){
+        this.enviarPeticion(fun,'api/0.1/schedule/'+legajo+'/'+edificio,'DELETE',{valid_from:validoDesde})
     }
 
     pedir_horarios_persona(fun,legajo){
