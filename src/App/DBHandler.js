@@ -132,7 +132,7 @@ export default class DBHandler{
     }
 
     borrar_horario(fun,legajo,edificio,validoDesde){
-        this.enviarPeticion(fun,'api/0.1/schedule/'+legajo+'/'+edificio,'DELETE',{valid_from:validoDesde})
+        this.enviarPeticion(fun,'api/0.1/schedule/'+legajo+'/'+edificio+'?valid_from='+encodeURIComponent(validoDesde.split('T')[0]),'DELETE')
     }
 
     pedir_horarios_persona(fun,legajo){
@@ -226,6 +226,12 @@ export default class DBHandler{
             }
             if(this.status == 400){
                 console.log(this.responseText);
+            }
+            if(this.status == 401){
+                console.log(this.responseText);
+            }
+            if(this.status === 404){
+                console.log(this.responseText)
             }
         };
 

@@ -37,10 +37,6 @@ export class CreacionConcepto extends Component{
         }
 
         let articulo = props.articulo;
-        if(!articulo || articulo.length === 0 || articulo === 'NUEVO'){
-            articulo = '';
-        }
-        
         
         this.state={
             articulo:articulo,
@@ -63,6 +59,12 @@ export class CreacionConcepto extends Component{
         this.actualizarPadre = props.actLista;
         this.cargarArticulo = this.cargarArticulo.bind(this);
 
+        if(articulo === null || articulo === undefined || articulo === -1){
+            articulo = '';
+        }
+        else{
+            this.db.pedir_articulo(this.cargarArticulo,articulo)
+        }
 
     }
 
@@ -89,7 +91,7 @@ export class CreacionConcepto extends Component{
     componentWillReceiveProps(props){
         
         let art = this.state.articulo;
-        if(props.articulo === 'NUEVO'){
+        if(props.articulo === -1){
             this.setState({
                 articulo:'',
                 descripcion:'',
@@ -103,8 +105,8 @@ export class CreacionConcepto extends Component{
             })
             return;   
         }
-        if (props.articulo  && props.articulo != 'NUEVO'){
-            this.db.pedir_articulo(this.cargarArticulo,1);
+        if (props.articulo !== -1){
+            this.db.pedir_articulo(this.cargarArticulo,props.articulo);
         }
 
         
@@ -114,8 +116,8 @@ export class CreacionConcepto extends Component{
 
     componentDidMount(){
         let codigo = this.state.articulo;
-        if(codigo && codigo != 'NUEVO'){
-            this.db.pedir_articulo(this.cargarArticulo,1);
+        if(codigo && codigo != -1){
+            this.db.pedir_articulo(this.cargarArticulo,codigo);
         }
     }
 
@@ -139,7 +141,7 @@ export class CreacionConcepto extends Component{
         }
         if(this.state.articulo === ''){
             this.db.pedir_articulos((listado) =>{
-                datos.code = listado.lenght;
+                datos.code = listado.articles.length + 1;
                 this.db.crear_articulo((datos)=>{
                     this.setState({articulo:datos.code});
                     this.actualizarPadre();},datos);

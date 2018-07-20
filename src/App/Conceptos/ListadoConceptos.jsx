@@ -40,7 +40,6 @@ class Contenedor extends Component{
     }
 
     actualizarDatos(valor,campo){
-        
         let dic = {[campo]:valor};
         if(campo === 'actual'){
             dic['mostrarEdicion'] = true;
@@ -66,7 +65,6 @@ class Contenedor extends Component{
     generarListado(){
 
         let lista = this.state.articulos;
-        console.log(lista);
         return lista.map((elem,index)=>
             {
                 if( elem[1].toLowerCase().includes(this.state.filtro.toLowerCase()) || this.state.filtro === ''){return <Articulo nombre={elem[1]} 
@@ -89,7 +87,7 @@ class Contenedor extends Component{
                     <TextField floatingLabelText={ <label>Busqueda</label> } 
                     onChange={(evento)=>this.actualizarDatos(evento.target.value,evento.target.name)
                     } name='filtro' ></TextField>
-                    <RaisedButton label={'Nuevo'} primary={true} onClick={()=>(this.actualizarDatos('NUEVO','actual'))}/>
+                    <RaisedButton label={'Nuevo'} primary={true} onClick={()=>(this.actualizarDatos(-1,'actual'))}/>
                     <br/>
                     </div>
                     <div style={{margin:'5px'}} >
@@ -131,7 +129,7 @@ class Articulo extends Component{
 
     render(){
         return(
-            <ListItem onClick={()=>this.actualizarPadre(this.state.id,'actual')} >
+            <ListItem onClick={()=>this.actualizarPadre(this.state.codigo,'actual')} >
                 <Avatar>
                     {this.state.codigo}
                 </Avatar>
