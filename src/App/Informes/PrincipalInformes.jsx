@@ -134,19 +134,19 @@ class Contenedor extends Component{
         if(this.state.tipo === 0){
             botonImprimir = <RaisedButton label='Imprimir' onClick={
                 ()=>{
-                    console.log(this.state.inicio)
+                    
                     let datos = {initial_date:this.state.inicio,end_date:this.state.fin};
                     var request = new XMLHttpRequest();
                     request.onreadystatechange = function(){
                         if(this.readyState == 4 && this.status == 200){
-                            console.log('entra2')
+                            
                             var blob = this.response;
-                            console.log(blob)
+                            
                             var filename = 'informe.xlsx';
                             let a = document.createElement('a');
                             a.href = window.URL.createObjectURL(blob);
                             a.download = filename;
-                            console.log(a.href)
+                            
                             a.click();
 
                         }

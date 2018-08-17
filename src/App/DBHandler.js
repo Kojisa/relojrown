@@ -2,8 +2,8 @@
 export default class DBHandler{
     
     PORT = "";// ":8000";
-    HOST = "localhost:3000"//"relojesadmin.sanvicente.gob.ar";//'10.10.10.52';"172.20.0.3";
-    HOSTRAFAM = 'localhost:3000'//'relojesadmin.sanvicente.gob.ar'//'172.22.20.241';//"10.10.10.52";//'172.22.20.241';
+    HOST = "relojesadmin.sanvicente.gob.ar"//"relojesadmin.sanvicente.gob.ar";//'10.10.10.52';"172.20.0.3";
+    HOSTRAFAM = '10.10.10.52:3000'//'relojesadmin.sanvicente.gob.ar'//'172.22.20.241';//"10.10.10.52";//'172.22.20.241';
     RUTABASICA = 'api/0.1/';
 
 
@@ -63,6 +63,7 @@ export default class DBHandler{
             category:categoria,
             group:agrupamiento,
         }
+        console.log(datos)
         this.enviarPeticion(fun,'api/0.1/attendance/presentism','POST',datos,true);
     }
 

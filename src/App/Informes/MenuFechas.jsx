@@ -38,7 +38,7 @@ import DBHandler from '../DBHandler.js';
     }
 
     generarAnios(){
-        let inicial = 2017;
+        let inicial = 2018;
         let final = new Date().getFullYear();
         let actual = inicial;
         let lista = [];
