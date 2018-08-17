@@ -21,6 +21,7 @@ import HorasExtras from './Dependencias/HorasExtras';
 import informes from './Informes/PrincipalInformes';
 import Home from './Home/HomeCuentas';
 import Usuarios from './Usuarios';
+import InformePresentes from './Informes/Asistencias';
 import HOME from 'homedir';
     
     class Nav extends React.Component{
@@ -68,8 +69,10 @@ import HOME from 'homedir';
                 'funcion':AsistenciaPorLegajo},
                 //{'nombre':'Horas Extras',
                 //'funcion':HorasExtras},
-                //{'nombre':'Informes',
-                //'funcion':informes},
+                {'nombre':'Informes',
+                'funcion':informes},
+                {'nombre':'Asistencias',
+                'funcion':InformePresentes},
                 {'nombre':'Usuarios',
                 'funcion':Usuarios},
                 

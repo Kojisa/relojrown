@@ -134,7 +134,7 @@ class Contenedor extends Component{
         if(this.state.tipo === 0){
             botonImprimir = <RaisedButton label='Imprimir' onClick={
                 ()=>{
-                    console.log('entra')
+                    console.log(this.state.inicio)
                     let datos = {initial_date:this.state.inicio,end_date:this.state.fin};
                     var request = new XMLHttpRequest();
                     request.onreadystatechange = function(){

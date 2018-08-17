@@ -2,10 +2,18 @@
 export default class DBHandler{
     
     PORT = "";// ":8000";
-    HOST = "relojesrafam.sanvicente.gob.ar"//"relojesadmin.sanvicente.gob.ar";//'10.10.10.52';"172.20.0.3";
-    HOSTRAFAM = 'relojesrafam.sanvicente.gob.ar'//'relojesadmin.sanvicente.gob.ar'//'172.22.20.241';//"10.10.10.52";//'172.22.20.241';
+    HOST = "localhost:3000"//"relojesadmin.sanvicente.gob.ar";//'10.10.10.52';"172.20.0.3";
+    HOSTRAFAM = 'localhost:3000'//'relojesadmin.sanvicente.gob.ar'//'172.22.20.241';//"10.10.10.52";//'172.22.20.241';
     RUTABASICA = 'api/0.1/';
 
+
+    devolverHost(){
+        let host = this.HOST;
+        if (window.location.href.indexOf(this.HOST) < 0){
+            host = this.HOSTRAFAM;
+        }
+        return host
+    }
 
     actualizar_limite(fun,datos,tipo){
 
@@ -40,6 +48,22 @@ export default class DBHandler{
             datos['repeticion'] += 1;
             this.enviarPeticion(()=>{this.actualizar_limite(fun,datos,tipo)},'api/0.1/budget/'+extra,'POST',armarDatos,true);
         }
+    }
+
+
+    pedir_categorias(fun){
+        this.enviarPeticion(fun,'api/0.1/categories','GET',null,true);
+    }
+
+    pedir_presentismo_general(fun,desde,hasta,categoria,agrupamiento,secretaria){
+        let datos = {
+            from_date:desde, 
+            to_date:hasta,
+            secretariat:secretaria,
+            category:categoria,
+            group:agrupamiento,
+        }
+        this.enviarPeticion(fun,'api/0.1/attendance/presentism','POST',datos,true);
     }
 
     pedir_datos_usuario(fun,usuario){
@@ -132,7 +156,7 @@ export default class DBHandler{
     }
 
     borrar_horario(fun,legajo,edificio,validoDesde){
-        this.enviarPeticion(fun,'api/0.1/schedule/'+legajo+'/'+edificio+'?valid_from='+encodeURIComponent(validoDesde.split('T')[0]),'DELETE')
+        this.enviarPeticion(fun,'api/0.1/schedule/'+legajo+'/'+edificio+'?valid_from=\''+encodeURIComponent(validoDesde.split('T')[0]+'\''),'DELETE')
     }
 
     pedir_horarios_persona(fun,legajo){
