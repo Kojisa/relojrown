@@ -50,7 +50,6 @@ class Contenedor extends Component{
         this.descargarInforme = this.descargarInforme.bind(this);
         this.pedirInfo = this.pedirInfo.bind(this);
         this.descargarInforme = this.descargarInforme.bind(this);
-        this.pedirExcel = this.pedirExcel.bind(this);
 
         this.db.pedir_limite_secretarias(this.cargarSecretarias)
         this.db.pedir_categorias(this.cargarCategorias); 
