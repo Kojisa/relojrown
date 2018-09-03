@@ -67,6 +67,18 @@ export default class DBHandler{
         this.enviarPeticion(fun,'api/0.1/attendance/presentism','POST',datos,true);
     }
 
+    pedir_presentismo_general_excel(fun,desde,hasta,categoria,agrupamiento,secretaria){
+        let datos = {
+            from_date:desde, 
+            to_date:hasta,
+            secretariat:secretaria,
+            category:categoria,
+            group:agrupamiento,
+        }
+        console.log(datos)
+        this.enviarPeticion(fun,'api/0.1/attendance/presentism/excel','POST',datos,true);
+    }
+
     pedir_datos_usuario(fun,usuario){
         this.enviarPeticion(fun,'api/0.1/user/levels/'+usuario,'GET',null)
     }

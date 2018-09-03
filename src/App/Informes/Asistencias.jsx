@@ -49,11 +49,11 @@ class Contenedor extends Component{
         this.cargarSecretarias = this.cargarSecretarias.bind(this);
         this.descargarInforme = this.descargarInforme.bind(this);
         this.pedirInfo = this.pedirInfo.bind(this);
-
+        this.descargarInforme = this.descargarInforme.bind(this);
+        this.pedirExcel = this.pedirExcel.bind(this);
 
         this.db.pedir_limite_secretarias(this.cargarSecretarias)
-        this.db.pedir_categorias(this.cargarCategorias);
-        this.db.pedir_presentismo_general((datos)=>console.log(datos),'2018-06-01','2018-06-30',2,6,null)    
+        this.db.pedir_categorias(this.cargarCategorias); 
     }
 
     pedirInfo(){
@@ -81,13 +81,13 @@ class Contenedor extends Component{
 
         this.db.pedir_presentismo_general((datos)=>{
             this.setState({cargando:false,
-            datos:datos.attendance})
-            console.log(datos.attendance)},
+            datos:datos.attendance})},
         this.state.inicio,this.state.final,categoria,agrupamiento,secretaria);
     }
 
     descargarInforme(){
         var request = new XMLHttpRequest();
+        let fun = ()=>this.setState({generandoArchivo:false})
         request.onreadystatechange = function(){
             if(this.readyState === 4 && this.status === 200){
                 var blob = this.response;
@@ -99,12 +99,19 @@ class Contenedor extends Component{
                 a.href = window.URL.createObjectURL(blob);
                 a.download = filename;
                 a.dispatchEvent(e);
+                fun();
+            }
+            else{
+                console.log(this.response)
             }
         }
         let host = this.db.devolverHost();
-        request.open('POST',host + 'urlAPoner' ,true);
+        request.open('POST','http://' + host + '/api/0.1/attendance/presentism/excel' ,true);
         request.setRequestHeader('Access-Control-Allow-Origin','*');
-        request.responseText = 'blob';
+        request.responseType = 'blob';
+        request.setRequestHeader('auth_token',document.cookie.split(';')[0].substring(11));
+        request.setRequestHeader('username',document.cookie.split(';')[1].split('=')[1]);
+        
         
         let datos = {
             from_date:this.state.inicio, 
@@ -116,6 +123,7 @@ class Contenedor extends Component{
 
         request.setRequestHeader('Content-type','application/json');
         request.send(JSON.stringify(datos))
+        this.setState({generandoArchivo:true})
     }
 
     recibirDatos(datos){
@@ -142,20 +150,35 @@ class Contenedor extends Component{
 
     }
 
+
     render(){
 
         let botonPedir = <RaisedButton onClick={this.pedirInfo} 
                 label='Pedir Informacion' primary />
+
+        let botonExcel = <RaisedButton onClick={this.descargarInforme}
+            label='Descargar Excel' primary />
             
         if(this.state.inicio.length === 0 || this.state.inicio === null ||
             this.state.final.length === 0 || this.state.final === null){
                 botonPedir = <RaisedButton onClick={this.pedirInfo} 
                 label='Pedir Informacion' primary disabled/>
+                botonExcel = <RaisedButton onClick={this.descargarInforme}
+                label='Descargar Excel' primary disabled/>
         }
         
         if(this.state.cargando){
             botonPedir = <RaisedButton
                 label='Pidiendo Información' secondary />
+            botonExcel =  <RaisedButton onClick={this.descargarInforme}
+            label='Descargar Excel' primary disabled/>
+        }
+
+        if(this.state.generandoArchivo){
+            botonPedir = <RaisedButton onClick={this.pedirInfo} 
+                label='Pedir Informacion' primary disabled/>
+            botonExcel =  <RaisedButton 
+            label='Pidiendo Archivo' secondary/>
         }
 
         return (
@@ -165,8 +188,8 @@ class Contenedor extends Component{
                         <div>
                             <SelectField
                             value={this.state.indiceCategoria}
-                            onChange={(ev)=>{
-                                let ind = ev.target.value
+                            onChange={(ev,a,ind)=>{
+                                
                                 this.setState({
                                     indiceCategoria:ind,
                                     categoria:this.state.categorias[ind][0],
@@ -180,7 +203,7 @@ class Contenedor extends Component{
                             <br/>
                             <SelectField
                             value={this.state.secretaria}
-                            onChange={(ev)=>this.setState({secretaria:ev.target.value})}
+                            onChange={(ev,a,val)=>this.setState({secretaria:val})}
                             floatingLabelText='Secretaria'
                             floatingLabelFixed={true}
                             >
@@ -189,14 +212,14 @@ class Contenedor extends Component{
                         </div>
                         <div style={{marginTop:'31px'}}>
                             <Fechas funActInicio={(val)=>{
-                                console.log(val)
                                 this.setState({inicio:val})}}
                             funActFin={(val)=>{
-                                console.log(val)
                                 this.setState({final:val})}} />
                         </div>
                         <div style={{marginTop:'50px'}}>
                             {botonPedir}
+                            <br/>
+                            {botonExcel}
                         </div>
                     </div>
                     <div style={{marginTop:'5px'}}>
