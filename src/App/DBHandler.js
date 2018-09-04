@@ -2,7 +2,7 @@
 export default class DBHandler{
     
     PORT = "";// ":8000";
-    HOST = "relojesadmin.sanvicente.gob.ar"//"relojesadmin.sanvicente.gob.ar";//'10.10.10.52';"172.20.0.3";
+    HOST = "relojesrafam.sanvicente.gob.ar"//"relojesadmin.sanvicente.gob.ar";//'10.10.10.52';"172.20.0.3";
     HOSTRAFAM = '10.10.10.52:3000'//'relojesadmin.sanvicente.gob.ar'//'172.22.20.241';//"10.10.10.52";//'172.22.20.241';
     RUTABASICA = 'api/0.1/';
 
