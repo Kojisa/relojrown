@@ -60,3 +60,5 @@ typings/
 .vscode/launch.json
 
 build/
+src/server/RecabarFichajesFaltantes/fichadas.sql
+src/server/RecabarFichajesFaltantes/hsExtras.sql
