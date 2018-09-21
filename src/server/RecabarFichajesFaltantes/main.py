@@ -1,7 +1,7 @@
 from calcularHoras import generarArchivoHoras,calcularHorasExtras
 
 def main():
-    #generarArchivoHoras()
+    generarArchivoHoras()
     calcularHorasExtras()
 
 main()

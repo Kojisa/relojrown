@@ -1,20 +1,23 @@
-from conectores import conectarSQLServer
+from conectores import conectarSQLServer,conectarMYSQL
 import datetime
 
 QUERY = "SELECT CAST([BADGENUMBER] AS INT),[CHECKTIME]\
   FROM [rafam_relojes].[dbo].[CHECKINOUT] c\
   INNER JOIN [rafam_relojes].[dbo].[USERINFO] u\
   ON u.USERID = c.USERID\
-  where CHECKTIME > '2018-08-01'\
+  where CHECKTIME >= '2018-08-01'\
   group by BADGENUMBER,CHECKTIME\
   order by CAST(BADGENUMBER AS INT),CHECKTIME"
+QUERYBROWN = "select p.DocumentNr,a.accessDate from taccesslog a \
+inner join tperson p on p.idtx = a.idtx \
+where a.accessDate >= '20180601' and a.accessDate < '20180801'"
 MAX_DIF = datetime.timedelta(hours=13)
 MIN_DIF = datetime.timedelta(seconds=360)
 
 def obtenerInfo():
 
-    con,cur = conectarSQLServer()
-    cur.execute(QUERY)
+    con,cur = conectarMYSQL()
+    cur.execute(QUERYBROWN)
     datos = cur.fetchall()
 
     legajos = {}

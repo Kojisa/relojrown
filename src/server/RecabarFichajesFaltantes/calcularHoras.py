@@ -10,6 +10,8 @@ SQLEXISTE = 'SELECT LEGAJO FROM LEGAJOS WHERE LEGAJO = {}'
 SQLHORARIOS = "SELECT MONDAY_IN,MONDAY_OUT,TUESDAY_IN,TUESDAY_OUT,WEDNESDAY_IN,WEDNESDAY_OUT,THURSDAY_IN,THURSDAY_OUT,\
 FRIDAY_IN,FRIDAY_OUT,SATURDAY_IN,SATURDAY_OUT,SUNDAY_IN,SUNDAY_OUT from SCHEDULES \
  WHERE DOCKET_ID = {} AND FROM_DATE < TO_DATE('{}','DD/MM/YYYY') AND TO_DATE > TO_DATE('{}','DD/MM/YYYY') ORDER BY FROM_DATE DESC"
+SQLVALORHORA = "SELECT valor FROM per_liq_var_h WHERE legajo = {} AND mes = {} \
+AND anio = {} AND variable = 'RCA_ART' AND TIPO_LIQ = 'N'"
 
 
 SQLINSERTHORAS = "INSERT INTO ATTENDANCE (DOCKET_ID,CHECK_IN,CHECKOUT) VALUES({},'{}','{}');"
@@ -69,7 +71,6 @@ def obtenerEntradaSalida(legajo,entrada,db):
 
 def obtenerSegundos(horario,legajo,cur):
     entrada,salida = horario
-    segundosExtras = 0
     
     entradaIti,salidaIti = obtenerEntradaSalida(legajo,entrada,cur) #obtengo los horarios de entrada y salida estipulados
 
@@ -116,6 +117,14 @@ def obtenerSegundos(horario,legajo,cur):
     return dif/60,mod
 
 
+def obtenerValorHora(legajo,anio,mes,cur):
+    cur.execute(SQLVALORHORA.format(legajo,mes,anio))
+    res = cur.fetchall()
+    if(len(res) == 0):
+        return 0
+    else:
+        return res[0][0]
+
 def calcularHorasExtras():
     legajos = ordenarHorarios()
     con,cur = conectarORACLE()
@@ -145,7 +154,7 @@ def calcularHorasExtras():
 
             dependencia = cur.fetchall()[0][0]
 
-            valor_hora = 0
+            valor_hora = obtenerValorHora(legajo,entrada.year,entrada.month,cur)
             
             texto = SQLINSERTEXTRAS.format(ajustarISO(entrada.isoformat()),dependencia,valor_hora,cant,mod,legajo)
             archivo.write(texto + '\n')
