@@ -13,23 +13,6 @@ FRIDAY_IN,FRIDAY_OUT,SATURDAY_IN,SATURDAY_OUT,SUNDAY_IN,SUNDAY_OUT from SCHEDULE
 SQLVALORHORA = "SELECT valor FROM per_liq_var_h WHERE legajo = {} AND mes = {} \
 AND anio = {} AND variable = 'MH' AND TIPO_LIQ = 'N'" #'RCA_ART' brown 'MH' sv
 
-#black thread
-#scarlet hide
-#manufacturerd wood
-#scarlet orb
-#twilight stone
-#cursed sphere
-#glory bug
-#blessing needle
-#dark ore
-#tranquil stone
-#silver chunk
-#rusted lump
-#black pearl
-#meteor light
-#sealed box
-#crimson wing
-
 
 SQLINSERTHORAS = "INSERT INTO ATTENDANCE (DOCKET_ID,CHECK_IN,CHECKOUT) VALUES({},'{}','{}');"
 SQLINSERTEXTRAS = "INSERT INTO OVERTIMES (O_DATE,DEPENDENCE_ID,HOUR_VALUE,AMOUNT,MOD,DOCKET_ID) VALUES('{}','{}',{},{},{},{});"

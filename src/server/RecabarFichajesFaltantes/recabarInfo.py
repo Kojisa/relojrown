@@ -5,7 +5,7 @@ QUERY = "SELECT CAST([BADGENUMBER] AS INT),[CHECKTIME]\
   FROM [rafam_relojes].[dbo].[CHECKINOUT] c\
   INNER JOIN [rafam_relojes].[dbo].[USERINFO] u\
   ON u.USERID = c.USERID\
-  where CHECKTIME >= '2018-08-30'\
+  where CHECKTIME >= '2018-11-01'\
   group by BADGENUMBER,CHECKTIME\
   order by CAST(BADGENUMBER AS INT),CHECKTIME"
 QUERYBROWN = "select p.DocumentNr,a.accessDate from taccesslog a \

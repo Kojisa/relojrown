@@ -1,7 +1,7 @@
 #coding=latin
 def conectarSQLServer():
     import pypyodbc as SQL
-    con = SQL.connect('Driver={ODBC Driver 13 for SQL Server};'
+    con = SQL.connect('Driver={SQL Server};'
     'SERVER=10.10.10.66;'
     'Database=rafam_relojes;'
     'uid=rafam_relojes;'
