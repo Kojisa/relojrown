@@ -5,12 +5,12 @@ QUERY = "SELECT CAST([BADGENUMBER] AS INT),[CHECKTIME]\
   FROM [rafam_relojes].[dbo].[CHECKINOUT] c\
   INNER JOIN [rafam_relojes].[dbo].[USERINFO] u\
   ON u.USERID = c.USERID\
-  where CHECKTIME >= '2018-11-01'\
+  where CHECKTIME >= '2019-05-05'\
   group by BADGENUMBER,CHECKTIME\
   order by CAST(BADGENUMBER AS INT),CHECKTIME"
 QUERYBROWN = "select p.DocumentNr,a.accessDate from taccesslog a \
 inner join tperson p on p.idtx = a.idtx \
-where a.accessDate >= '20180901' and a.accessDate < '20181001'"
+where a.accessDate >= '20181201' and a.accessDate < '20190201'"
 MAX_DIF = datetime.timedelta(hours=13)
 MIN_DIF = datetime.timedelta(seconds=360)
 
